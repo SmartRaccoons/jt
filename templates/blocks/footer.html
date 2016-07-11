@@ -1,0 +1,10 @@
+<header>
+    <h1><a href="/"><%= lang.title %></a></h1>
+    <nav>
+        <% links.forEach(function (link) { %>
+            <a href="<%= link.url %>"><%= link.title %></a>
+        <% }) %>
+    </nav>
+</header>
+</body>
+</html>

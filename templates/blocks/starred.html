@@ -1,0 +1,5 @@
+<nav>
+    <% articles.forEach(function (article) { %>
+        <a href="/<%= article.url %>"><img src="<%= article.img_sm %>" /><%= article.title %></a>
+    <% }) %>
+</nav>

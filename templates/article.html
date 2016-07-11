@@ -1,0 +1,19 @@
+<%= header({url: url, title: title, description: description, image: image, lang: lang, version: version})%>
+
+<section>
+
+    <h1><%= article.title %></h1>
+    <small><%= lang.date(article.date) %></small>
+    <img src="<%= article.img %>" />
+    <%= article.full %>
+
+</section>
+<nav>
+    <%= lang.tags %>:
+    <% tags.forEach(function (t) { %>
+        <a href="/birka/<%= t.url %>"><%= t.title %></a>
+    <% }) %>
+</nav>
+<%= starred %>
+<%= sidebar %>
+<%= footer %>

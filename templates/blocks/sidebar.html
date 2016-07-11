@@ -1,0 +1,18 @@
+<aside>
+    <nav>
+        <% categories.forEach(function (category) { %>
+            <a href="/sadala/<%= category.url %>"><%= category.title %></a>
+        <% }) %>
+    </nav>
+    <nav>
+        <%= lang.connect %>
+        <a href="http://www.draugiem.lv/<%= lang.connect_dr %>">draugiem</a>
+        <a href="https://www.facebook.com/<%= lang.connect_fb %>">facebook</a>
+        <a href="https://twitter.com/<%= lang.connect_tw %>">twitter</a>
+    </nav>
+    <nav>
+        <% tags.forEach(function (tag) { %>
+            <a href="/birka/<%= tag.url %>"><%= tag.title %></a>
+        <% }) %>
+    </nav>
+</aside>

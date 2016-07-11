@@ -1,0 +1,22 @@
+{
+  "name": "RocketBlog",
+  "version": "0.0.1",
+  "author": {
+    "name": "Smart Raccoons",
+    "email": "smart@raccoons.lv",
+    "url": "http://smart.raccoons.lv/"
+  },
+  "dependencies": {
+    "emailjs": "1.0",
+    "express": "4.13",
+    "lodash": "4.0",
+    "memory-cache": "0.1.4",
+    "mysql": "mysqljs/mysql"
+  },
+  "devDependencies": {
+    "uglify-js": "2.6",
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-shell": "^1.1.2"
+  }
+}

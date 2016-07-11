@@ -1,0 +1,12 @@
+config.*.coffee
+public/d/.sass-cache/
+.idea/
+node_modules/
+bower_components/
+*~
+*.css.map
+*.css
+*.js.map
+*.js
+!public/d/j.js
+!public/d/c.css
