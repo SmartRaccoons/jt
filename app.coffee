@@ -38,7 +38,7 @@ class Template
       version: pjson.version
       lang: config.lang
       header: _.template(@read_template('blocks/header'))
-      footer: _.template(@read_template('blocks/footer'))({lang: config.lang, links: config.static.map (link)-> _.pick(link, ['title', 'url']) })
+      footer: _.template(@read_template('blocks/footer'))({lang: config.lang, version: pjson.version, links: config.static.map (link)-> _.pick(link, ['title', 'url']) })
     }
 
   read_template: (name)->
@@ -109,8 +109,8 @@ ORDER BY
       if err
         throw err
       rows.forEach (article)=>
-        article.categories = article.categories.split(',').map (c)-> parseInt(c)
-        article.tags = article.tags.split(',').map (c)-> parseInt(c)
+        article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
+        article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
         @_articles[article.id] = article
         @_articles_index.push(article.id)
         if article.starred

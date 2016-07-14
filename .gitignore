@@ -9,4 +9,6 @@ bower_components/
 *.js.map
 *.js
 !public/d/j.js
+!public/d/js/social.js
+!public/d/js/redirect.js
 !public/d/c.css

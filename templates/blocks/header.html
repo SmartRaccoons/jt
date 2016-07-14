@@ -2,25 +2,24 @@
 <html lang="lv">
 <head>
     <meta charset="utf-8">
-    <title><%= title ? title + ' | ' : '' %><%= lang.title %></title>
+    <title><%- title || lang.title %></title>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
-    <meta name="description" content="<%= description || lang.description %>" />
+    <meta name="description" content="<%- description || lang.description %>" />
 
     <link rel="icon" href="/d/images/favicon.ico" type="image/ico" />
 
-    <meta property="og:url"                content="<%= lang.url %><%= url %>" />
-    <meta property="og:title"              content="<%= title || lang.title %>" />
-    <meta property="og:description"        content="<%= description || lang.description %>" />
-    <meta property="og:image"              content="<%= image || lang.image %>" />
+    <meta property="og:url" content="<%= lang.url %><%= url %>" />
+    <meta property="og:title" content="<%- title || lang.title %>" />
+    <meta property="og:description" content="<%- description || lang.description %>" />
+    <meta property="og:image" content="<%= image || lang.image %>" />
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@<%= lang.connect_tw %>">
     <meta name="twitter:url" content="<%= lang.url %><%= url %>">
-    <meta name="twitter:title" content="<%= title || lang.title %>">
-    <meta name="twitter:description" content="<%= description || lang.description %>">
+    <meta name="twitter:title" content="<%- title || lang.title %>">
+    <meta name="twitter:description" content="<%- description || lang.description %>">
     <meta name="twitter:image" content="<%= image || lang.image %>">
 
     <link rel="stylesheet" href="/d/css/c.css?<%= version %>" />
-
 </head>
 <body>

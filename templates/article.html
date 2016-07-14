@@ -8,12 +8,29 @@
     <%= article.full %>
 
 </section>
+<% if (tags.lenght > 0) { %>
 <nav>
     <%= lang.tags %>:
     <% tags.forEach(function (t) { %>
-        <a href="/birka/<%= t.url %>"><%= t.title %></a>
+        <a href="/birka/<%= t.url %>"><%- t.title %></a>
     <% }) %>
 </nav>
+
+<% } %>
+
+<div id="draugiemLike"></div>
+
+<a class="twitter-share-button"
+   href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(article.title) %>&url=<%= encodeURIComponent(lang.url + '/' + article.url) %>&via=<%= lang.connect_tw %>"
+   data-size="large">
+    Tweet</a>
+
+<div class="fb-like" <% if (article.url_old) { %> data-href="<%= lang.url %>/<%= article.url_old %>" <% } %> data-layout="button_count" data-action="like" data-size="large" data-show-faces="true" data-share="true"></div>
+
+<br />
+
+<div class="fb-comments" <% if (article.url_old) { %> data-href="<%= lang.url %>/<%= article.url_old %>" <% } %> data-numposts="100"></div>
+
 <%= starred %>
 <%= sidebar %>
 <%= footer %>

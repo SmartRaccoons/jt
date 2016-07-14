@@ -6,5 +6,18 @@
         <% }) %>
     </nav>
 </header>
+<div id="fb-root"></div>
+<script src="/d/j.js?<%= version %>"></script>
+
+<script type="text/javascript" src="//www.draugiem.lv/api/api.js"></script>
+<script type="text/javascript">
+    var p = {
+        name:"jaunatelpa",
+        popup:true,
+        mobile:true
+    };
+    new DApi.Like(p).append('draugiemLike');
+</script>
+
 </body>
 </html>
