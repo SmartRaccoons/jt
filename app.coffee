@@ -39,7 +39,7 @@ class Template
     @_index = _.template(@read_template('index'))
     @_article = _.template(@read_template('article'))
     @_static = _.template(@read_template('static'))
-    @_404 = _.template(@read_template('404'))
+    @_error = _.template(@read_template('error'))
     @_blocks = {}
     @_params_default = {
       version: pjson.version
@@ -65,8 +65,8 @@ class Template
   index: (params)->
     @_index(_.extend(@_params_default, @blocks(['sidebar', 'starred']), params))
 
-  status404: ->
-    @_404({error: config.error['404']})
+  error: (code)->
+    @_error({error: config.error[code]})
 
   article: (params)->
     @_article(_.extend(@_params_default, @blocks(['sidebar', 'starred']), params))
@@ -261,7 +261,7 @@ App = {
       fn()
     catch e
       if e instanceof Error404
-        return res.status(404).send(App.template.status404())
+        return res.status(404).send(App.template.error('404'))
       throw e
 }
 
