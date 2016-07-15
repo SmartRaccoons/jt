@@ -1,25 +1,31 @@
 <%= header({url: url, title: title, description: description, image: image, lang: lang, version: version})%>
 
-<body>
-    <% articles.forEach(function (article) { %>
-        <section>
-            <h1><a href="/<%= article.url %>"><%= article.title %></a></h1>
-            <small><%= lang.date(article.date) %></small>
-            <a href="/<%= article.url %>"><img src="<%= article.img %>" /></a>
-            <p>
-                <%= article.intro %>
-            </p>
-            <a href="/<%= article.url %>"><%= lang.read_more %></a>
-        </section>
-    <% }) %>
-    <nav>
-        <% if (page.active > 1) { %>
-            <a href="<%= url + (page.active > 2 ? '/' + (page.active - 1) : (url.length === 0 ? '/' : '')) %>"><%= lang.next %></a>
-        <% } %>
-        <% if (page.active < page.total) { %>
-            <a href="<%= url + '/' + (page.active + 1) %>"><%= lang.previous %></a>
-        <% } %>
-    </nav>
-    <%= starred %>
-    <%= sidebar %>
+<div>
+<%= starred %>
+
+    <div>
+        <% articles.forEach(function (article) { %>
+            <section>
+                <h1><a href="/<%= article.url %>" title="<%- article.title %>"><%- article.title %></a>
+                    <small><%= lang.date(article.date) %></small>
+                </h1>
+
+                <a href="/<%= article.url %>" title="<%- article.title %>"><img alt="<%- article.title %>" src="<%= article.img %>" /></a>
+                <p>
+                    <%- article.intro %>
+                </p>
+                <a href="/<%= article.url %>"><%= lang.read_more %></a>
+            </section>
+        <% }) %>
+        <nav class="pages">
+            <% if (page.active > 1) { %>
+                <a class="pages-prev" href="<%= url + (page.active > 2 ? '/' + (page.active - 1) : (url.length === 0 ? '/' : '')) %>" title="<%= lang.next %>"><%= lang.next %></a>
+            <% } %>
+            <% if (page.active < page.total) { %>
+                <a class="pages-next" href="<%= url + '/' + (page.active + 1) %>" title="<%= lang.previous %>"><%= lang.previous %></a>
+            <% } %>
+        </nav>
+        <%= sidebar %>
+    </div>
+</div>
 <%= footer %>

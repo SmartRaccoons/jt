@@ -2,9 +2,15 @@
 <html lang="lv">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title><%= error.title %></title>
+    <style type="text/css">
+        body {
+            padding: 2rem;
+            font: 2rem/1.3 arial;
+        }
+    </style>
 </head>
 <body>
-Lapa nav atrasta. Ej uz sākumu <a href="http://jaunatelpa.lv">www.jaunatelpa.lv</a>
+<%= error.description %>
 </body>
 </html>

@@ -26,6 +26,13 @@ email   = require('emailjs').server.connect({
 })
 
 
+class Error404 extends Error
+  name: 'Error404'
+  constructor: ->
+    @value = 404
+    @message = 'Not Found'
+
+
 class Template
   constructor: (params)->
     @_params = params
@@ -37,8 +44,10 @@ class Template
     @_params_default = {
       version: pjson.version
       lang: config.lang
-      header: _.template(@read_template('blocks/header'))
-      footer: _.template(@read_template('blocks/footer'))({lang: config.lang, version: pjson.version, links: config.static.map (link)-> _.pick(link, ['title', 'url']) })
+      header: _.template(@read_template('blocks/header'), {imports: {
+        links: config.static.map (link)-> _.pick(link, ['title', 'url'])
+      }})
+      footer: _.template(@read_template('blocks/footer'))({version: pjson.version, ganalytics: config.ganalytics})
     }
 
   read_template: (name)->
@@ -57,7 +66,7 @@ class Template
     @_index(_.extend(@_params_default, @blocks(['sidebar', 'starred']), params))
 
   status404: ->
-    @_404()
+    @_404({error: config.error['404']})
 
   article: (params)->
     @_article(_.extend(@_params_default, @blocks(['sidebar', 'starred']), params))
@@ -89,8 +98,8 @@ SELECT
     , im1.`url` AS img
     , im2.`url` AS img_sm
 
-    , (SELECT GROUP_CONCAT(`id`) FROM `article_category` WHERE `article_id`=a.`id`) AS `categories`
-    , (SELECT GROUP_CONCAT(`id`) FROM `article_tag` WHERE `article_id`=a.`id`) AS `tags`
+    , (SELECT GROUP_CONCAT(`category_id`) FROM `article_category` WHERE `article_id`=a.`id`) AS `categories`
+    , (SELECT GROUP_CONCAT(`tag_id`) FROM `article_tag` WHERE `article_id`=a.`id`) AS `tags`
 FROM
 	`article` AS a
 LEFT JOIN
@@ -116,6 +125,7 @@ ORDER BY
         if article.starred
           @_articles_starred.push(article.id)
         @_articles_url[article.url] = article.id
+        @_articles[article.id].full = "<p>\n" + @_articles[article.id].full.split("\n").join("\n</p>\n<p>\n") + "\n</p>"
       check()
 
     @_categories = {}
@@ -123,7 +133,7 @@ ORDER BY
     @_params.dbconnection.query """
 SELECT
 	a.`id`, a.`title`, a.`url`
-    , (SELECT GROUP_CONCAT(`id`) FROM `article_category` WHERE `category_id`=a.`id`) AS `articles`
+    , (SELECT GROUP_CONCAT(`article_id`) FROM `article_category` WHERE `category_id`=a.`id`) AS `articles`
 FROM
 	`category` AS a
 ORDER BY
@@ -132,7 +142,7 @@ ORDER BY
       if err
         throw err
       rows.forEach (category)=>
-        category.articles = category.articles.split(',').map (c)-> parseInt(c)
+        category.articles = if !category.articles then [] else category.articles.split(',').map (c)-> parseInt(c)
         @_categories[category.id] = category
         @_categories_url[category.url] = category.id
       check()
@@ -142,7 +152,7 @@ ORDER BY
     @_params.dbconnection.query """
 SELECT
 	a.`id`, a.`title`, a.`url`
-    , (SELECT GROUP_CONCAT(`id`) FROM `article_tag` WHERE `tag_id`=a.`id`) AS `articles`
+    , (SELECT GROUP_CONCAT(`article_id`) FROM `article_tag` WHERE `tag_id`=a.`id`) AS `articles`
 FROM
 	`tag` AS a
 ORDER BY
@@ -151,7 +161,7 @@ ORDER BY
       if err
         throw err
       rows.forEach (tag)=>
-        tag.articles = tag.articles.split(',').map (c)-> parseInt(c)
+        tag.articles = if !tag.articles then [] else tag.articles.split(',').map (c)-> parseInt(c)
         @_tags[tag.id] = tag
         @_tags_url[tag.url] = tag.id
       check()
@@ -177,7 +187,7 @@ ORDER BY
   list: (ids = @_articles_index, page)->
     pages = Math.ceil(ids.length / @per_page)
     if page < 1 or page > pages
-      throw App.errors.notFound()
+      throw new Error404
     {
       page: {
         total: pages
@@ -193,7 +203,7 @@ ORDER BY
   category: (url, page)->
     id = @_categories_url[url]
     if !id
-      throw new App.errors.notFound()
+      throw new Error404
     _.extend @list(@_categories[id].articles, page), {
       url: "/#{config.lang.category}/#{url}"
       title: @_categories[id].title
@@ -203,7 +213,7 @@ ORDER BY
   tag: (url, page)->
     id = @_tags_url[url]
     if !id
-      throw new App.errors.notFound()
+      throw new Error404
     _.extend @list(@_tags[id].articles, page), {
       url: "/#{config.lang.tag}/#{url}"
       title: @_tags[id].title
@@ -212,14 +222,14 @@ ORDER BY
 
   article: (url)->
     if !@_articles_url[url]
-      throw new App.errors.notFound()
+      throw new Error404
     {
       url: "/#{url}"
       title: @_articles[@_articles_url[url]].title
       description: @_articles[@_articles_url[url]].intro
       image: @_articles[@_articles_url[url]].img
       article: @_articles[@_articles_url[url]]
-      tags: @_articles[@_articles_url[url]].tags.map (id)=> @_tags[id]
+      tags: @_articles[@_articles_url[url]].tags.map (id)=> _.pick(@_tags[id], ['title', 'url'])
     }
 
 
@@ -250,18 +260,9 @@ App = {
     try
       fn()
     catch e
-      if e instanceof App.errors.notFound
+      if e instanceof Error404
         return res.status(404).send(App.template.status404())
       throw e
-
-  errors: {
-    request: (value, message)->
-      @value = value
-      @message = message
-
-    notFound: ->
-      App.errors.request(404, 'Not Found')
-  }
 }
 
 

@@ -1,36 +1,39 @@
 <%= header({url: url, title: title, description: description, image: image, lang: lang, version: version})%>
+<div>
 
-<section>
+    <%= starred %>
+    <div>
+        <section>
+            <h1><%- article.title %>
+                <small><%= lang.date(article.date) %></small></h1>
+            <%= article.full %>
+        </section>
+        <% if (tags.length > 0) { %>
+        <nav class="tags">
+            <%= lang.tags %>:
+            <% tags.forEach(function (t) { %>
+                <a href="/birka/<%= t.url %>" title="<%- t.title %>"><%- t.title %></a>
+            <% }) %>
+        </nav>
 
-    <h1><%= article.title %></h1>
-    <small><%= lang.date(article.date) %></small>
-    <img src="<%= article.img %>" />
-    <%= article.full %>
+        <% } %>
+        <nav class="shares">
 
-</section>
-<% if (tags.lenght > 0) { %>
-<nav>
-    <%= lang.tags %>:
-    <% tags.forEach(function (t) { %>
-        <a href="/birka/<%= t.url %>"><%- t.title %></a>
-    <% }) %>
-</nav>
+            <div id="draugiemLike"></div>
 
-<% } %>
+            <a class="twitter-share-button"
+               href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(article.title) %>&url=<%= encodeURIComponent(lang.url + '/' + article.url) %>&via=<%= lang.connect_tw %>"
+               data-size="large">
+                Tweet</a>
 
-<div id="draugiemLike"></div>
+            <div class="fb-like" <% if (article.url_old) { %> data-href="<%= lang.url %>/<%= article.url_old %>" <% } %> data-layout="button_count" data-action="like" data-size="large" data-show-faces="true" data-share="true"></div>
 
-<a class="twitter-share-button"
-   href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(article.title) %>&url=<%= encodeURIComponent(lang.url + '/' + article.url) %>&via=<%= lang.connect_tw %>"
-   data-size="large">
-    Tweet</a>
+        </nav>
 
-<div class="fb-like" <% if (article.url_old) { %> data-href="<%= lang.url %>/<%= article.url_old %>" <% } %> data-layout="button_count" data-action="like" data-size="large" data-show-faces="true" data-share="true"></div>
+        <div class="fb-comments" <% if (article.url_old) { %> data-href="<%= lang.url %>/<%= article.url_old %>" <% } %> data-numposts="100"></div>
 
-<br />
+        <%= sidebar %>
+    </div>
+</div>
 
-<div class="fb-comments" <% if (article.url_old) { %> data-href="<%= lang.url %>/<%= article.url_old %>" <% } %> data-numposts="100"></div>
-
-<%= starred %>
-<%= sidebar %>
 <%= footer %>

@@ -1,5 +1,43 @@
 @import "compass"
 
+
+$breakpoints: (tiny: 320px, small: 480px, normal: 640px, large: 800px, wide: 1080px)
+
+=m-default
+  @content
+=m-tiny
+  @media (min-width: map-get($breakpoints, tiny))
+    @content
+=m-small
+  @media (min-width: map-get($breakpoints, small))
+    @content
+=m-normal
+  @media (min-width: map-get($breakpoints, normal))
+    @content
+=m-large
+  @media (min-width: map-get($breakpoints, large))
+    @content
+=m-larger
+  @media (min-width: map-get($breakpoints, larger))
+    @content
+=m-wide
+  @media (min-width: map-get($breakpoints, wide))
+    @content
+
+=box-style
+  border: 1px solid #a6a6a6
+  border-width: 1px 0
+  > ul, > div
+    list-style: none
+    margin: 0
+    padding: 0.5em 0
+    border: 1px solid #ffffff
+    border-width: 1px 0
+    background: #f5f4f4
+
+@import "icons/*.png"
+
+
 *
   -moz-box-sizing: border-box
   -webkit-box-sizing: border-box
@@ -11,8 +49,215 @@ html, body
   margin: 0
 html
   font-size: 62.5%
-body
-  font: normal 1.5rem/1.4 arial
-  height: 100%
-  position: relative
 
+body
+  position: relative
+  font: normal 10px/1.2 arial
+  color: #030303
+  +m-tiny
+    font-size: 12px
+  +m-small
+    font-size: 14px
+  +m-normal
+    font-size: 16px
+  +m-large
+    font-size: 18px
+body>div
+  padding: 1em
+  >div
+    position: relative
+    +m-large
+      padding-right: 300px
+header > div, body > div
+  max-width: 1000px
+  margin: 0 auto
+
+header
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAZCAMAAADHTrRNAAAAA1BMVEUAAACnej3aAAAAFUlEQVR42pXBAQEAAACAkP6vtiHaAAAyAAGiCcttAAAAAElFTkSuQmCC) repeat-x 0 100%
+  margin-top: 1em
+  > div
+    width: 100%
+    overflow: hidden
+    position: relative
+    padding: 0 1em
+  img
+    width: 60%
+    max-width: 377px
+    float: left
+  nav
+    height: 100%
+    padding-left: 5%
+    float: left
+    a
+      display: block
+      position: absolute
+      bottom: 0
+      color: #ffffff
+      background: #000000
+      text-decoration: none
+      margin: 0
+      padding: 0
+      line-height: 25px
+      &:hover
+        color: #979393
+
+.starred
+  +box-style
+  margin-top: 1em
+  margin-bottom: 1em
+  display: none
+  +m-small
+    display: block
+  li
+    display: inline-block
+    width: 20%
+    padding: 0 0.5em
+  a
+    display: block
+    text-decoration: none
+    color: #030303
+    img
+      max-width: 100%
+
+.pages
+  padding: 1em 0
+  text-align: right
+  a
+    font-size: 0.8em
+    text-decoration: none
+    &:last-child
+      margin-left: 2em
+  .pages-prev
+    &:before
+      content: '< '
+  .pages-next
+    &:after
+      content: ' >'
+
+aside
+  +m-large
+    position: absolute
+    width: 280px
+    right: 0
+    top: 0
+  .category, .tag
+    +box-style
+  h2
+    margin: 0 0 0.5em
+    padding: 0
+    font-weight: normal
+    text-align: center
+    font-size: 1.2em
+  .category
+    ul
+      text-align: center
+    li
+      display: inline
+      margin: 0.5em 1em
+      +m-large
+        display: block
+        text-align: left
+    a
+      text-decoration: none
+      font-weight: bold
+      font-size: 1.7em
+  .social
+    background: #f5f4f4
+    border: 1px solid #ffffff
+    border-width: 1px 0
+    text-align: center
+    padding: 1em 0
+    a
+      display: inline-block
+      margin: 0.2em
+      width: 68px
+      height: 68px
+      text-indent: -4000px
+  .social-fb
+    +icons-sprite(fb)
+  .social-tw
+    +icons-sprite(tw)
+  .social-dr
+    +icons-sprite(dr)
+  .tag
+    >div
+      padding-left: 1em
+      padding-right: 1em
+    a
+      text-decoration: none
+      margin-right: 1em
+      font-size: 0.8em
+      white-space: nowrap
+      &:hover
+        text-decoration: underline
+
+section
+  h1
+    a
+      display: block
+      font-weight: normal
+      text-decoration: none
+      &:hover
+        text-decoration: underline
+  img
+    max-width: 100%
+
+.tags
+  margin: 1em 0
+  font-size: 0.8em
+  a
+    text-decoration: none
+    margin: 0 0.5em
+
+.shares
+  margin: 1em 0
+  line-height: 0.7
+  #draugiemLike
+    display: inline-block
+
+
+.static
+  +box-style
+  margin-top: 1em
+  margin-bottom: 1em
+  img
+    max-width: 50%
+  >div
+    width: 100%
+    overflow: hidden
+
+h1
+  font-size: 2em
+  margin: 1em 0
+  padding: 0
+  small
+    display: block
+    font-size: 0.3em
+    font-weight: normal
+h2
+  font-size: 1.8em
+  margin: 1em 0
+  padding: 0
+h3
+  font-size: 1.6em
+  margin: 1em 0
+  padding: 0
+h4
+  font-size: 1.4em
+  margin: 0.5em 0
+  padding: 0
+h5
+  font-size: 1.2em
+  margin: 0.5em 0
+  padding: 0
+h6
+  font-size: 1em
+  margin: 0.5em 0
+  padding: 0
+p
+  font-size: 1em
+  margin: 1em 0
+  padding: 0
+a
+  color: #030303
+  text-decoration: underline
