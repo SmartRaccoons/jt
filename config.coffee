@@ -16,6 +16,36 @@ Uzrunā redaktoru: <a href="mailto:jaunatelpa@gmail.com">jaunatelpa@gmail.com</a
  """
 }]
 
+exports.demo_page = """
+
+
+
+
+  <h1>h1 nosaukums</h1>
+  <h2>h2 nosaukums</h2>
+  <h3>h3 nosaukums</h3>
+  <h4>h4 nosaukums</h4>
+  <h5>h5 nosaukums</h5>
+  <h6>h6 nosaukums</h6>
+
+    <a href='#'>Saite</a>
+    <strong>izcalts teksts</strong>
+    <i>italic teksts</i>
+    <i>italic teksts</i>
+
+<ul>
+  <li>saroksta pnkts</li>
+  <li>saroksta pnkts 2</li>
+  <li>saroksta pnkts 3</li>
+</ul>
+
+<blockquote>Citāts: tikai tas kurš sēž ir gatavs</blockquote>
+
+
+
+
+"""
+
 exports.lang = {
   tag: 'birka'
   category: 'sadala'

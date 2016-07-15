@@ -292,13 +292,21 @@ App.data._load =>
         description: page.description
       }, page))
 
-  app.get '/:url', (req, res)->
-    App.try res, ->
-      res.send App.template.article App.data.article(req.params.url)
+  app.get '/demo-view-page', (req, res)->
+    res.send App.template.static({
+      url: "/demo-view-page"
+      title: 'Demo view page'
+      description: config.demo_page
+    })
 
   app.get "/#{config.hiddenReload}", (req, res)->
     App.template.load_block('sidebar', App.data.sidebar())
     App.template.load_block('starred', App.data.starred())
     res.send 'DONE'
+
+  app.get '/:url', (req, res)->
+    App.try res, ->
+      res.send App.template.article App.data.article(req.params.url)
+
 
 console.log('http://127.0.0.1:'+config.port+'/ version:'+pjson.version)
