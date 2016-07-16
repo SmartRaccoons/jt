@@ -16,7 +16,7 @@ dbconnection = mysql.createConnection({
   password : config.dbconnection.pass
   database : config.dbconnection.name
 })
-
+dbconnection.connect()
 
 email   = require('emailjs').server.connect({
   user: config.support.email,
@@ -82,7 +82,6 @@ class Data
     @_params = params
 
   _load: (callback)->
-    @_params.dbconnection.connect()
     loaded = 0
     check = ->
       loaded++
@@ -94,7 +93,7 @@ class Data
     @_articles_url = []
     @_params.dbconnection.query """
 SELECT
-	a.`id`, a.`title`, a.`url`, a.`url_old`, a.`date`, a.`intro`, a.`full`, a.`starred`
+	a.`id`, a.`title`, a.`url`, a.`url_old`, a.`date`, a.`intro`, a.`full`, a.`starred`, a.`video`
     , im1.`url` AS img
     , im2.`url` AS img_sm
 
@@ -118,14 +117,21 @@ ORDER BY
       if err
         throw err
       rows.forEach (article)=>
+        video = @_parse_video(article.video)
+        if video
+          article.video = video[0]
+          if !article.img
+            article.img = 'http://img.youtube.com/vi/' + video[1][0] + '/hqdefault.jpg'
+          if !article.img_sm
+            article.img_sm = 'http://img.youtube.com/vi/' + video[1][0] + '/mqdefault.jpg'
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
+        article.full = @_parse_video(article.full)[0]
         @_articles[article.id] = article
         @_articles_index.push(article.id)
         if article.starred
           @_articles_starred.push(article.id)
         @_articles_url[article.url] = article.id
-        @_articles[article.id].full = "<p>\n" + @_articles[article.id].full.split("\n").join("\n</p>\n<p>\n") + "\n</p>"
       check()
 
     @_categories = {}
@@ -166,8 +172,6 @@ ORDER BY
         @_tags_url[tag.url] = tag.id
       check()
 
-    @_params.dbconnection.end()
-
   sidebar: ->
     {
       categories: _.orderBy _.values(@_categories), (o)-> o.order
@@ -182,7 +186,7 @@ ORDER BY
 
   _articles_list: (ar)->
     ar.map (id)=>
-      _.pick(@_articles[id], ['title', 'date', 'url', 'intro', 'img'])
+      _.pick(@_articles[id], ['title', 'date', 'url', 'intro', 'img', 'video'])
 
   list: (ids = @_articles_index, page)->
     pages = Math.ceil(ids.length / @per_page)
@@ -232,7 +236,14 @@ ORDER BY
       tags: @_articles[@_articles_url[url]].tags.map (id)=> _.pick(@_tags[id], ['title', 'url'])
     }
 
-
+  _parse_video: (v)->
+    if not v
+      return v
+    ids = []
+    v = v.replace /https\:\/\/www\.youtube\.com\/watch\?v=([^#\&\?\s]*)/g, (link, id)->
+      ids.push(id)
+      '<div class="video"><iframe width="560" height="349" src="http://www.youtube.com/embed/' + id + '?rel=0&hd=1" frameborder="0" allowfullscreen></iframe></div>'
+    [v, ids]
 
 app = express()
 app.listen(config.port)
@@ -300,9 +311,10 @@ App.data._load =>
     })
 
   app.get "/#{config.hiddenReload}", (req, res)->
-    App.template.load_block('sidebar', App.data.sidebar())
-    App.template.load_block('starred', App.data.starred())
-    res.send 'DONE'
+    App.data._load =>
+      App.template.load_block('sidebar', App.data.sidebar())
+      App.template.load_block('starred', App.data.starred())
+      res.send 'DONE'
 
   app.get '/:url', (req, res)->
     App.try res, ->

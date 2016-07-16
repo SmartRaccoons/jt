@@ -5,12 +5,15 @@
 
     <div>
         <% articles.forEach(function (article) { %>
-            <section>
+            <section class="list">
                 <h1><a href="/<%= article.url %>" title="<%- article.title %>"><%- article.title %></a>
                     <small><%= lang.date(article.date) %></small>
                 </h1>
-
-                <a href="/<%= article.url %>" title="<%- article.title %>"><img alt="<%- article.title %>" src="<%= article.img %>" /></a>
+                <% if (article.video) { %>
+                    <%= article.video %>
+                <% } else { %>
+                    <a href="/<%= article.url %>" title="<%- article.title %>"><img alt="<%- article.title %>" src="<%= article.img %>" /></a>
+                <% } %>
                 <p>
                     <%- article.intro %>
                 </p>

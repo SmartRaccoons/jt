@@ -110,6 +110,7 @@ header
     display: block
   li
     display: inline-block
+    vertical-align: top
     width: 20%
     padding: 0 0.5em
   a
@@ -117,6 +118,7 @@ header
     text-decoration: none
     color: #030303
     img
+      display: block
       max-width: 100%
 
 .pages
@@ -191,14 +193,16 @@ aside
       &:hover
         text-decoration: underline
 
-section
+.list
   h1
+    margin-bottom: 0.5em
     a
       display: block
       font-weight: normal
       text-decoration: none
       &:hover
         text-decoration: underline
+section
   img
     max-width: 100%
 
@@ -225,6 +229,17 @@ section
   >div
     width: 100%
     overflow: hidden
+
+.video
+  position: relative
+  padding-bottom: 56.25%
+  height: 0
+  iframe
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
 
 h1
   font-size: 2em

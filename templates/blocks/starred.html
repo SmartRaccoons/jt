@@ -1,10 +1,9 @@
 <% if (articles.length > 0) { %>
 <nav class="starred">
     <ul>
-    <% for(var i=0; i< 5; i++) { %><%
-        articles.forEach(function (article) {
+    <% articles.forEach(function (article) {
         %><li><a href="/<%= article.url %>" title="<%- article.title %>"><img src="<%= article.img_sm %>" alt="<%- article.title %>" /><%- article.title %></a></li><%
-    }) %><% } %>
+    }) %>
     </ul>
 </nav>
 <% } %>
