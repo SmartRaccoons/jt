@@ -17,3 +17,4 @@ exports.init = (app)=>
     ].map((f)-> fs.readFileSync(f) ).join("\n")
 
   app.use('/d', express.static(__dirname + '/public/d'))
+  app.use('/i', express.static(__dirname + '/public/i'))

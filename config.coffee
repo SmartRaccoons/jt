@@ -1,5 +1,6 @@
-exports.development = true
+exports.development = false
 exports.port = 9099
+exports.port_admin = 9100
 
 exports.static = [{
   url: 'par-mums'
@@ -85,7 +86,7 @@ exports.lang = {
   connect_tw: 'JaunaTelpa'
   connect_tw_title: 'seko twitter.com lapā'
 }
-exports.ganalytics = 'UA-78307944-1'
+exports.ganalytics = 'UA-xxxxx-x'
 exports.error = {
   404: {
     title: '404 kļūda'
@@ -96,7 +97,7 @@ exports.error = {
   }
 }
 
-exports.hiddenReload = 'slapansReloads'
+exports.hiddenReload = 'hiddenReload'
 
 exports.support = {
   email: 'no-reply@raccoons.lv',

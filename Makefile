@@ -3,7 +3,15 @@ install :
 upgrade :
 	ncu -a
 
+admin-compile :
+	coffee express-admin/custom.json.coffee
+	coffee express-admin/config.json.coffee
+
+admin :
+	node node_modules/express-admin/app.js express-admin
+
 compile :
+	make admin-compile
 	grunt compile
 
 production :

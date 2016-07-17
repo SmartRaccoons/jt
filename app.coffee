@@ -6,8 +6,7 @@ pjson = require('./package.json')
 mysql = require('mysql')
 
 
-if process.argv[2]
-  _.extend(config, require("./config.#{process.argv[2]}"))
+_.extend(config, require('./config.local'))
 
 
 dbconnection = mysql.createConnection({

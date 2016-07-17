@@ -12,3 +12,7 @@ bower_components/
 !public/d/js/social.js
 !public/d/js/redirect.js
 !public/d/c.css
+express-admin/users.json
+express-admin/custom.json
+express-admin/config.json
+public/i
