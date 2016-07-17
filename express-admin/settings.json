@@ -154,7 +154,7 @@
                     "textarea": true
                 },
                 "type": "text",
-                "allowNull": true,
+                "allowNull": false,
                 "defaultValue": null,
                 "listview": {
                     "show": false
@@ -170,7 +170,7 @@
                     "textarea": true
                 },
                 "type": "text",
-                "allowNull": true,
+                "allowNull": false,
                 "defaultValue": null,
                 "listview": {
                     "show": false

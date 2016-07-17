@@ -3,6 +3,9 @@ install :
 upgrade :
 	ncu -a
 
+run :
+	coffee app.coffee
+
 admin-compile :
 	coffee express-admin/custom.json.coffee
 	coffee express-admin/config.json.coffee

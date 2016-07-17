@@ -81,18 +81,34 @@ class Data
     @_params = params
 
   _load: (callback)->
-    loaded = 0
-    check = ->
-      loaded++
-      if loaded is 3
-        callback()
+    @_load_images =>
+      @_load_articles =>
+        @_load_categories =>
+          @_load_tags callback
+
+  _load_images: (callback)->
+    @_images = {}
+    @_params.dbconnection.query """
+      SELECT
+        a.`id`, a.`title`, a.`url`
+      FROM
+        `image` AS a
+    """, (err, rows)=>
+      if err
+        throw err
+      rows.forEach (image)=>
+        image.url = '/i/' + image.url
+        @_images[image.id] = image
+      callback()
+
+  _load_articles: (callback)->
     @_articles = {}
     @_articles_index = []
     @_articles_starred = []
     @_articles_url = []
     @_params.dbconnection.query """
 SELECT
-	a.`id`, a.`title`, a.`url`, a.`url_old`, a.`date`, a.`intro`, a.`full`, a.`starred`, a.`video`
+	a.`id`, a.`title`, a.`url`, a.`url_old`, a.`date`, a.`intro`, a.`full`, a.`starred`, a.`published`, a.`video`
     , im1.`url` AS img
     , im2.`url` AS img_sm
 
@@ -108,8 +124,6 @@ LEFT JOIN
 	`image` AS im2
 ON
 	a.`img_sm_id`=im2.`id`
-WHERE
-	a.`published`=1
 ORDER BY
 	a.`date` DESC, a.`id` DESC
       """, (err, rows)=>
@@ -125,14 +139,19 @@ ORDER BY
             article.img_sm = 'http://img.youtube.com/vi/' + video[1][0] + '/mqdefault.jpg'
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
-        article.full = @_parse_video(article.full)[0]
+        article.full = _.template(@_parse_video(article.full)[0])({
+          img: (id)=>
+            "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" />"
+        })
         @_articles[article.id] = article
-        @_articles_index.push(article.id)
-        if article.starred
+        if article.published
+          @_articles_index.push(article.id)
+        if article.published and article.starred
           @_articles_starred.push(article.id)
         @_articles_url[article.url] = article.id
-      check()
+      callback()
 
+  _load_categories: (callback)->
     @_categories = {}
     @_categories_url = {}
     @_params.dbconnection.query """
@@ -147,11 +166,12 @@ ORDER BY
       if err
         throw err
       rows.forEach (category)=>
-        category.articles = if !category.articles then [] else category.articles.split(',').map (c)-> parseInt(c)
+        category.articles = if !category.articles then [] else _.intersection(@_articles_index, category.articles.split(',').map (c)-> parseInt(c) )
         @_categories[category.id] = category
         @_categories_url[category.url] = category.id
-      check()
+      callback()
 
+  _load_tags: (callback)->
     @_tags = {}
     @_tags_url = {}
     @_params.dbconnection.query """
@@ -166,10 +186,10 @@ ORDER BY
       if err
         throw err
       rows.forEach (tag)=>
-        tag.articles = if !tag.articles then [] else tag.articles.split(',').map (c)-> parseInt(c)
+        tag.articles = if !tag.articles then [] else _.intersection(@_articles_index, tag.articles.split(',').map (c)-> parseInt(c) )
         @_tags[tag.id] = tag
         @_tags_url[tag.url] = tag.id
-      check()
+      callback()
 
   sidebar: ->
     {
@@ -223,8 +243,10 @@ ORDER BY
       description: config.lang.description_tag(@_tags[id].title)
     }
 
-  article: (url)->
+  article: (url, published=true)->
     if !@_articles_url[url]
+      throw new Error404
+    if !@_articles[@_articles_url[url]].published and published
       throw new Error404
     {
       url: "/#{url}"
@@ -319,5 +341,11 @@ App.data._load =>
     App.try res, ->
       res.send App.template.article App.data.article(req.params.url)
 
+  app.get '/unpublished/:url', (req, res)->
+    App.try res, ->
+      res.send App.template.article App.data.article(req.params.url, false)
+
+  app.get '*', (req, res)->
+    res.status(404).send(App.template.error('404'))
 
 console.log('http://127.0.0.1:'+config.port+'/ version:'+pjson.version)
