@@ -46,8 +46,8 @@ class Fetch
       instance.createPage()
     .then (page)->
       sitepage = page
-      console.info 'http://jaunatelpa.lv/' + url
-      page.open('http://jaunatelpa.lv/' + url)
+      console.info 'http://www.jaunatelpa.lv/' + url
+      page.open('http://www.jaunatelpa.lv/' + url)
     .then (status)->
       console.info 'status:', status
       if status is 'success'
@@ -87,13 +87,16 @@ class Fetch
       articles
     , helper.clean, helper.slug
 
+  fetch_article: (callback)->
+
+
   save_image: (image, url, title, intro, callback)->
     img_url = 'w/' + (if intro then 'intro' else 'full') + '/' + url + '.' + image.substr(-3)
-    @download image, img_url
-    dbconnection.query 'INSERT INTO `image` SET ?', {title: title, url: img_url}, (err, result)->
-      if err
-        throw err
-      callback(result.insertId)
+    @download image, img_url, =>
+      dbconnection.query 'INSERT INTO `image` SET ?', {title: title, url: img_url}, (err, result)->
+        if err
+          throw err
+        callback(result.insertId)
 
   save_article: (article, callback=->)->
     dbconnection.query 'SELECT `id` FROM `article` WHERE `url`=?', [article.url], (err, result)=>
@@ -103,6 +106,7 @@ class Fetch
         console.info('Already in DB ' + result[0].id + ' ' + article.url)
         return callback()
       save = (article)->
+        article.published = 1
         dbconnection.query 'INSERT INTO `article` SET ?', article, (err, result)->
           if err
             throw err
@@ -120,8 +124,18 @@ class Fetch
 
 
 f = new Fetch()
-f.fetch_list 0, (articles)->
-  console.info 'saving ', articles.length
-  articles.reverse()
-  articles.forEach (article)->
-    f.save_article(article)
+save_list = (page, callback = (->), callbackError = (->))->
+  f.fetch_list page, (articles)->
+    console.info 'saving ', articles.length
+    if articles.length is 0
+      returncallbackError()
+    articles.reverse()
+    saved = 0
+    articles.forEach (article)->
+      f.save_article article, ->
+        saved++
+        if saved is articles.length
+          callback()
+
+save_list 3, ->
+  console.info 'ready'
