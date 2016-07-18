@@ -130,6 +130,10 @@ ORDER BY
       if err
         throw err
       rows.forEach (article)=>
+        if article.img
+          article.img = '/i/' + article.img
+        if article.img_sm
+          article.img_sm = '/i/' + article.img_sm
         video = @_parse_video(article.video)
         if video
           article.video = video[0]
@@ -139,7 +143,7 @@ ORDER BY
             article.img_sm = 'http://img.youtube.com/vi/' + video[1][0] + '/mqdefault.jpg'
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
-        article.full = _.template(@_parse_video(article.full)[0])({
+        article.full = if !article.full then '' else _.template(@_parse_video(article.full)[0])({
           img: (id)=>
             "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" />"
         })
