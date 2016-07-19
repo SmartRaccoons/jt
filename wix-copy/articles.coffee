@@ -37,7 +37,7 @@ class Fetch
         callback()
     .end()
 
-  fetch: (url, callback, args...)->
+  fetch: (selector, url, callback, args...)->
     sitepage = null
     phInstance = null
     phantom.create()
@@ -50,29 +50,39 @@ class Fetch
       page.open('http://www.jaunatelpa.lv/' + url)
     .then (status)->
       console.info 'status:', status
-      if status is 'success'
-        return sitepage.evaluate.apply sitepage, args
-      else
+      if status isnt 'success'
         throw status
-    .then (content)->
-      sitepage.close()
-      phInstance.exit()
-      callback(content)
+      page_ready = ->
+        console.info 'page ready'
+        sitepage.evaluate.apply sitepage, args
+        .then (content)->
+          sitepage.close()
+          phInstance.exit()
+          callback(content)
+      check_ready_state = ->
+        sitepage.evaluate ((selector)-> $(selector).html()), selector
+        .then (status)->
+          if status isnt ''
+            return page_ready()
+          return setTimeout check_ready_state, 300
+      check_ready_state()
     .catch (error)->
       console.log('ERROR: ', error)
       throw error
       phInstance.exit()
 
   fetch_list: (page, callback, url='#!blank/cxqm/page/')->
-    @fetch url + page, callback, (clean, slug)->
+    @fetch 'div[id^="MediaTopPage_PhotoPost"], div[id^="MediaTopPage_VideoPost"]', url + page, callback, (clean, slug)->
       articles = []
       $('div[id^="MediaTopPage_PhotoPost"], div[id^="MediaTopPage_VideoPost"]').each ->
         type = if $(this).attr('id').indexOf('MediaTopPage_PhotoPost') is 0 then 'photo' else 'video'
         link = $(this).find('.font_5').closest('a')
         url_old = link.attr('href').split('jaunatelpa.lv/')[1]
+        date = new Date($(this).find('.font_9').text())
+        date.setHours(date.getHours() + 10)
         article = {
             title: link.text()
-            date: new Date($(this).find('.font_9').text()).toISOString().slice(0, 19).replace('T', ' ')
+            date: date.toISOString().slice(0, 19).replace('T', ' ')
             url: slug(url_old.substr(2).split('/cjds/')[0])
             url_old: url_old
         }
@@ -87,9 +97,6 @@ class Fetch
       articles
     , helper.clean, helper.slug
 
-  fetch_article: (callback)->
-
-
   save_image: (image, url, title, intro, callback, db=true)->
     img_url = 'w/' + (if intro then 'intro' else 'full') + '/' + url + '.' + image.substr(-3)
     @download image, img_url, =>
@@ -101,6 +108,8 @@ class Fetch
         callback(result.insertId)
 
   save_tags: (article_id, tags, callback)->
+    if tags.length is 0
+      return callback()
     done = 0
     check = ->
       done++
@@ -207,7 +216,7 @@ class Fetch
     dbconnection.query """
       SELECT * FROM `article` WHERE
         `full` IS NULL AND `url_old` IS NOT NULL
-      ORDER BY RAND() LIMIT 1, 1
+      ORDER BY `date` DESC, `id` DESC LIMIT 1
     """, (err, rows)=>
       if err
         throw err
@@ -215,8 +224,8 @@ class Fetch
         console.info 'no articles left'
         return callback_error()
       article = rows[0]
-      @fetch article.url_old, (content)=>
-        if !content or content.tags.length is 0 or !content.full
+      @fetch '[data-proxy-name="MediaLabel"]', article.url_old, (content)=>
+        if !content or !content.full
           if failed > 5
             return callback_error()
           return @complete_article(callback, callback_error, failed + 1)
@@ -229,6 +238,8 @@ class Fetch
               if err
                 throw err
               callback()
+          if content.images.length is 0
+            return save_article()
           content.images.forEach (image, id)=>
             @save_image image, article.url + '-' + (id + 1), '', false, (image_url)=>
               content.full = content.full.replace(image, '/i/' + image_url)
@@ -240,7 +251,7 @@ class Fetch
         {
           tags: $('[id$="SinglePostMediaTop_MediaPost__0_0_tags"]').find('a').map( -> $(this).text() )
           images: c.find('img').map( -> $(this).attr('src'))
-          full: c.innerHTML.replace(/[\r\n]+/g, "\n").trim()
+          full: c.html().replace(/[\r\n]+/g, "\n").trim()
         }
 
       , helper.clean

@@ -28,7 +28,8 @@ exports.clean = function (el) {
         });
         el.find('span').each(function () {
             var tag = '';
-            if ($(this).attr('style').indexOf('font-weight:bold;') > -1) {
+            var style = $(this)[0].getAttribute('style')
+            if (style && style.indexOf('font-weight:bold;') > -1) {
                 tag = 'strong'
             }
             $(this).before((tag ? '<' + tag + '>' : '') + $(this).html() + (tag ? '</' + tag + '>' : ''));
