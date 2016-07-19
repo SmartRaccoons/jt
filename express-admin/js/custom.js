@@ -34,10 +34,11 @@ $(document).ready(function() {
 
     var update_url = function (el) {
         var link = el.closest('td').find('.article_link');
+        var url = window.location.protocol+'//'+window.location.hostname.split('puorvaldeiba.')[1]+'/unpublished/' + el.val()
         if (link.length === 0) {
-            el.closest('td').append('<a class="article_link" href="/unpublished/' + el.val() + '">preview</a>');
+            el.closest('td').append('<a class="article_link" href="'+ url + '">preview</a>');
         } else {
-            link.attr('href', '/unpublished/' + el.val());
+            link.attr('href', url);
         }
     };
     $('input[name$="[url]"]').each(function () {
@@ -64,7 +65,7 @@ $(document).ready(function() {
     $('input[type=file]').each(function () {
         var val = $('input[type=text][name="'+$(this).attr('name')+'"]').val();
         if (val) {
-            $(this).closest('td').append('<img src="/i/'+val+'" />');
+            $(this).closest('td').append('<img src="'+window.location.protocol+'//'+window.location.hostname.split('puorvaldeiba.')[1]+'/i/'+val+'" />');
         }
     });
 
