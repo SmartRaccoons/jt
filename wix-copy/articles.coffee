@@ -63,8 +63,8 @@ class Fetch
       throw error
       phInstance.exit()
 
-  fetch_list: (page, callback)->
-    @fetch '#!blank/cxqm/page/' + page, callback, (clean, slug)->
+  fetch_list: (page, callback, url='#!blank/cxqm/page/')->
+    @fetch url + page, callback, (clean, slug)->
       articles = []
       $('div[id^="MediaTopPage_PhotoPost"], div[id^="MediaTopPage_VideoPost"]').each ->
         type = if $(this).attr('id').indexOf('MediaTopPage_PhotoPost') is 0 then 'photo' else 'video'
@@ -119,23 +119,81 @@ class Fetch
       else
         save(article)
 
+  save_page: (page, callback=(->), callback_error=(->), failed=0)->
+    @fetch_list page, (articles)=>
+      console.info 'saving ', articles.length
+      if articles.length is 0
+        if failed > 3
+          return callback_error()
+        return @save_page(page, callback, callback_error, failed + 1)
+      articles.reverse()
+      saved = 0
+      articles.forEach (article)=>
+        @save_article article, ->
+          saved++
+          if saved is articles.length
+            callback()
+
+  complete_category: (category, page, callback=(->), callback_error=(->), failed=0)->
+    category_urls = {
+      1: '#!blank/cxqm/category/Izklaide/page/'
+      2: '#!blank/cxqm/category/Sports/page/'
+      3: '#!blank/cxqm/category/Bizness/page/'
+    }
+    @fetch_list page, (articles)=>
+      console.info 'articles ', articles.length
+      if articles.length is 0
+        if failed > 3
+          return callback_error()
+        return @complete_category(category, page, callback, callback_error, failed + 1)
+      saved = 0
+      check = ->
+        saved++
+        if saved is articles.length
+          callback()
+      articles.forEach (article)->
+        dbconnection.query 'SELECT `id` FROM `article` WHERE `url`=?', [article.url], (err, result_article)->
+          if err
+            throw err
+          if result_article.length isnt 1
+            console.info 'cannot find ', article.url_old, article
+            return callback_error()
+          dbconnection.query 'SELECT `id` FROM `article_category` WHERE `article_id`=? AND `category_id`=?', [result_article[0].id, category], (err, result)->
+            if err
+              throw err
+            if result.length is 1
+              return check()
+            dbconnection.query 'INSERT INTO `article_category` SET ?', {article_id: result_article[0].id, category_id: category}, (err, result)->
+              if err
+                throw err
+              return check()
+    , category_urls[category]
+
+  complete_article: ->
 
 
 
 
 f = new Fetch()
-save_list = (page, callback = (->), callbackError = (->))->
-  f.fetch_list page, (articles)->
-    console.info 'saving ', articles.length
-    if articles.length is 0
-      returncallbackError()
-    articles.reverse()
-    saved = 0
-    articles.forEach (article)->
-      f.save_article article, ->
-        saved++
-        if saved is articles.length
-          callback()
+if process.argv[2] is 'page'
+  page = if process.argv[3] then parseInt(process.argv[3]) else 0
+  save = ->
+    f.save_page page, ->
+      page++
+      save()
+    , ->
+      console.info 'ERROR page ', page
+  save()
 
-save_list 3, ->
-  console.info 'ready'
+else if process.argv[2] is 'article'
+  f.complete_article()
+
+else if process.argv[2] is 'category'
+  page = if process.argv[4] then parseInt(process.argv[4]) else 0
+  save = ->
+    f.complete_category parseInt(process.argv[3]), page, ->
+      page++
+      save()
+    , ->
+      console.info 'ERROR page ', page
+  save()
