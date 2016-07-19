@@ -13,6 +13,9 @@ if (hash.substr(0, 2) !== "#!") {
 return;
 }
 hash = hash.substr(2);
+if (hash.indexOf("blank/cxqm/category/Ziņas") > -1 || hash.indexOf("blank/cxqm/page/") > -1) {
+return window.location = "/";
+}
 var article = hash.indexOf("/cjds/") > -1 ? hash.split("/cjds/")[0] : null;
 var category = hash.split("blank/cxqm/category/")[1];
 var tag = hash.split("blank/cxqm/tag/")[1];
@@ -20,10 +23,10 @@ if (article) {
 return window.location = "/" + slug(article);
 }
 if (category) {
-return window.location = "/sadala/" + slug(category);
+return window.location = "/sadala/" + slug(category.split("/")[0]);
 }
 if (tag) {
-return window.location = "/birka/" + slug(tag);
+return window.location = "/birka/" + slug(tag.split("/")[0]);
 }
 })();
 
