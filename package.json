@@ -13,7 +13,8 @@
     "lodash": "4.0",
     "memory-cache": "0.1.4",
     "moment": "^2.14.1",
-    "mysql": "mysqljs/mysql"
+    "mysql": "mysqljs/mysql",
+    "request": "^2.73.0"
   },
   "devDependencies": {
     "uglify-js": "2.6",
