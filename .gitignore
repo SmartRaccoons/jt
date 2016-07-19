@@ -14,7 +14,9 @@ bower_components/
 !public/d/c.css
 express-admin/users.json
 express-admin/custom.json
+!express-admin/custom.json.coffee
 express-admin/config.json
+!express-admin/config.json.coffee
 !express-admin/js/custom.js
 !wix-copy/helper.js
 public/i
