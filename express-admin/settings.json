@@ -31,7 +31,7 @@
                     "multiple": true
                 },
                 "type": "int(11)",
-                "allowNull": false,
+                "allowNull": true,
                 "listview": {
                     "show": true
                 },
@@ -61,7 +61,7 @@
                     "multiple": true
                 },
                 "type": "int(11)",
-                "allowNull": false,
+                "allowNull": true,
                 "listview": {
                     "show": true
                 },
