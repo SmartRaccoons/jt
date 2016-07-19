@@ -82,7 +82,7 @@ class Fetch
            article.video = 'https://www.youtube.com/watch?v=' + $(this).find('iframe').attr('src').split('youtube.com/embed/')[1].split('?')[0]
         intro = $(this).find('[id$="_textrichTextContainer"]')
         clean(intro)
-        article.intro = intro.html()
+        article.intro = intro.html().replace(/[\r\n]+/g, "\n").trim()
         articles.push(article)
       articles
     , helper.clean, helper.slug
@@ -90,13 +90,47 @@ class Fetch
   fetch_article: (callback)->
 
 
-  save_image: (image, url, title, intro, callback)->
+  save_image: (image, url, title, intro, callback, db=true)->
     img_url = 'w/' + (if intro then 'intro' else 'full') + '/' + url + '.' + image.substr(-3)
     @download image, img_url, =>
+      if !db
+        return callback(img_url)
       dbconnection.query 'INSERT INTO `image` SET ?', {title: title, url: img_url}, (err, result)->
         if err
           throw err
         callback(result.insertId)
+
+  save_tags: (article_id, tags, callback)->
+    done = 0
+    check = ->
+      done++
+      if done is tags.length
+        callback()
+    tags.forEach (tag)->
+      tag_slug = helper.slug(tag)
+      found = (tag_id)->
+        save = ->
+          dbconnection.query 'INSERT INTO `article_tag` SET ? ', {tag_id: tag_id, article_id: article_id}, (err, rows)->
+            if err
+              throw err
+            check()
+        dbconnection.query 'SELECT `id` FROM `article_tag` WHERE `tag_id`= ? AND `article_id`=?', [tag_id, article_id], (err, rows)->
+          if err
+            throw err
+          if rows.length > 0
+            return check()
+          return save()
+      dbconnection.query """
+        SELECT `id` FROM `tag` WHERE `url`=?
+      """, [tag_slug], (err, rows)->
+        if err
+          throw err
+        if rows.length > 0
+          return found(rows[0].id)
+        dbconnection.query 'INSERT INTO `tag` SET ?', {title: tag, url: tag_slug}, (err, rows)->
+          if err
+            throw err
+          found(rows.insertId)
 
   save_article: (article, callback=->)->
     dbconnection.query 'SELECT `id` FROM `article` WHERE `url`=?', [article.url], (err, result)=>
@@ -169,7 +203,47 @@ class Fetch
               return check()
     , category_urls[category]
 
-  complete_article: ->
+  complete_article: (callback= (->), callback_error= (->), failed=0)->
+    dbconnection.query """
+      SELECT * FROM `article` WHERE
+        `full` IS NULL AND `url_old` IS NOT NULL
+      ORDER BY RAND() LIMIT 1, 1
+    """, (err, rows)=>
+      if err
+        throw err
+      if rows.length is 0
+        console.info 'no articles left'
+        return callback_error()
+      article = rows[0]
+      @fetch article.url_old, (content)=>
+        if !content or content.tags.length is 0 or !content.full
+          if failed > 5
+            return callback_error()
+          return @complete_article(callback, callback_error, failed + 1)
+        @save_tags article.id, content.tags, =>
+          images_saved = 0
+          save_article = ->
+            if images_saved isnt content.images.length
+              return
+            dbconnection.query 'UPDATE `article` SET `full`=? WHERE `id`=?', [content.full, article.id], (err, rows)->
+              if err
+                throw err
+              callback()
+          content.images.forEach (image, id)=>
+            @save_image image, article.url + '-' + (id + 1), '', false, (image_url)=>
+              content.full = content.full.replace(image, '/i/' + image_url)
+              images_saved++
+              save_article()
+            , false
+      , (clean)->
+        c = clean($('[data-proxy-name="MediaLabel"]'))
+        {
+          tags: $('[id$="SinglePostMediaTop_MediaPost__0_0_tags"]').find('a').map( -> $(this).text() )
+          images: c.find('img').map( -> $(this).attr('src'))
+          full: c.innerHTML.replace(/[\r\n]+/g, "\n").trim()
+        }
+
+      , helper.clean
 
 
 
@@ -186,7 +260,15 @@ if process.argv[2] is 'page'
   save()
 
 else if process.argv[2] is 'article'
-  f.complete_article()
+  save = ->
+    f.complete_article ->
+      console.info('saved')
+      setTimeout ->
+        save()
+      , 2000
+    , ->
+      console.info 'ERROR'
+  save()
 
 else if process.argv[2] is 'category'
   page = if process.argv[4] then parseInt(process.argv[4]) else 0

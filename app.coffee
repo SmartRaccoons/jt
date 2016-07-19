@@ -143,7 +143,7 @@ ORDER BY
             article.img_sm = 'http://img.youtube.com/vi/' + video[1][0] + '/mqdefault.jpg'
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
-        article.full = if !article.full then '' else _.template(@_parse_video(article.full)[0])({
+        article.full = if !article.full then '' else @_parse_paragraph _.template(@_parse_video(article.full)[0])({
           img: (id)=>
             "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" />"
         })
@@ -209,7 +209,9 @@ ORDER BY
 
   _articles_list: (ar)->
     ar.map (id)=>
-      _.pick(@_articles[id], ['title', 'date', 'url', 'intro', 'img', 'video'])
+      article = _.pick(@_articles[id], ['title', 'date', 'url', 'intro', 'img', 'video'])
+      article.intro = article.intro.replace("\n", "<br />\n")
+      article
 
   list: (ids = @_articles_index, page)->
     pages = Math.ceil(ids.length / @per_page)
@@ -260,6 +262,16 @@ ORDER BY
       article: @_articles[@_articles_url[url]]
       tags: @_articles[@_articles_url[url]].tags.map (id)=> _.pick(@_tags[id], ['title', 'url'])
     }
+
+  _parse_paragraph: (str)->
+    str.replace(/[\r\n]+/g, "\n").trim().split("\n").map (block)->
+      block = block.trim()
+      if block is '&nbsp;'
+        return ''
+      if block.substr(0, 1) is '<' and ['<em', '<st', '<i', '<a'].indexOf(block.substr(0, 3)) is -1
+        return block
+      return '<p>' + block + '</p>'
+    .join("\n")
 
   _parse_video: (v)->
     if not v

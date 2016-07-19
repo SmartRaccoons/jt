@@ -13,19 +13,49 @@ exports.slug = function (text) {
         .replace(/^-+/, '')             // Trim - from start of text
         .replace(/-+$/, '');            // Trim - from end of text
 };
-
 exports.clean = function (el) {
-    el.find('p').each(function () {
-        $(this).before($(this).html() + "<br />");
-        $(this).remove();
-    });
-    el.find('span').each(function () {
-        $(this).before($(this).html());
-        $(this).remove();
-    });
-    el.find('a').each(function () {
-        $(this).before('<a href="'+$(this).attr('href')+'">' + $(this).html() + '</a>');
-        $(this).remove();
-    });
+    var clean = function () {
+        el.find('p').each(function () {
+            var cont = $(this).html().trim();
+            if (cont) {
+                $(this).before("\n"+$(this).html().trim() + "\n");
+            }
+            $(this).remove();
+        });
+        el.find('div').each(function () {
+            $(this).before($(this).html());
+            $(this).remove();
+        });
+        el.find('span').each(function () {
+            var tag = '';
+            if ($(this).attr('style').indexOf('font-weight:bold;') > -1) {
+                tag = 'strong'
+            }
+            $(this).before((tag ? '<' + tag + '>' : '') + $(this).html() + (tag ? '</' + tag + '>' : ''));
+            $(this).remove();
+        });
+        el.find('a').each(function () {
+            $(this).before('<a href="' + $(this).attr('href') + '">' + $(this).html() + '</a>');
+            $(this).remove();
+        });
+        el.find('iframe').each(function () {
+            if ($(this).attr('src').indexOf('youtube.com') > -1) {
+                $(this).before("\n https://www.youtube.com/watch?v=" + $(this).attr('src').split('youtube.com/embed/')[1].split('?')[0] + "\n");
+                $(this).remove();
+            }
+        });
+        el.find('img').each(function () {
+            $(this).before('<img src="' + $(this).attr('src') + '" alt="' + $(this).attr('alt') + '" />');
+            $(this).remove();
+        });
+        el.find('br').each(function () {
+            $(this).before("\n");
+            $(this).remove();
+        });
+        return el;
+    };
+    for (var i = 0; i<10; i++) {
+        el = clean(el);
+    }
     return el;
 };
