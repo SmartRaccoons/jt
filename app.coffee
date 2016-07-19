@@ -1,4 +1,5 @@
 config = require('./config')
+request = require('request')
 express = require('express')
 _ = require('lodash')
 fs = require('fs')
@@ -137,10 +138,18 @@ ORDER BY
         video = @_parse_video(article.video)
         if video
           article.video = video[0]
-          if !article.img
+          if !article.img and video[1][0]
             article.img = 'http://img.youtube.com/vi/' + video[1][0] + '/hqdefault.jpg'
-          if !article.img_sm
+          if !article.img_sm and video[1][0]
             article.img_sm = 'http://img.youtube.com/vi/' + video[1][0] + '/mqdefault.jpg'
+          if video[2][0]
+            request.get 'http://vimeo.com/api/v2/video/' + video[2][0] + '.json', (error, response, body)=>
+              if !error and response.statusCode is 200
+                data = JSON.parse(body)
+                if !article.img_sm
+                  @_articles[article.id].img_sm = data[0].thumbnail_small
+                if !article.img
+                  @_articles[article.id].img = data[0].thumbnail_large
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
         article.full = if !article.full then '' else @_parse_paragraph _.template(@_parse_video(article.full)[0])({
@@ -276,11 +285,15 @@ ORDER BY
   _parse_video: (v)->
     if not v
       return v
-    ids = []
+    ids_youtube = []
+    ids_vimeo = []
     v = v.replace /https\:\/\/www\.youtube\.com\/watch\?v=([^#\&\?\s]*)/g, (link, id)->
-      ids.push(id)
+      ids_youtube.push(id)
       '<div class="video"><iframe width="560" height="349" src="http://www.youtube.com/embed/' + id + '?rel=0&hd=1" frameborder="0" allowfullscreen></iframe></div>'
-    [v, ids]
+    .replace /https\:\/\/vimeo\.com\/(\d+)/g, (link, id)->
+      ids_vimeo.push(id)
+      '<div class="video"><iframe width="560" height="349" src="//player.vimeo.com/video/' + id + '" frameborder="0" allowfullscreen></iframe></div>'
+    [v, ids_youtube, ids_vimeo]
 
 app = express()
 app.listen(config.port)

@@ -72,7 +72,7 @@ exports.lang = {
   next: 'Jaunākas ziņas'
   read_more: 'Lasīt vairāk'
   description: 'Neatkarīga JAUNA (ziņu) TELPA.'
-  image: '/d/images/jaunatelpa.png'
+  image: 'http://jaunatelpa.lv/d/images/jaunatelpa.png'
   description_category: (title)->
     "Sadaļa #{title}"
   description_tag: (title)->
