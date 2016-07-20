@@ -277,7 +277,7 @@ ORDER BY
       block = block.trim()
       if block is '&nbsp;'
         return ''
-      if block.substr(0, 1) is '<' and ['<em', '<st', '<i', '<a'].indexOf(block.substr(0, 3)) is -1
+      if block.substr(0, 1) is '<' and ['<em', '<st', '<im', '<a ', '<i>'].indexOf(block.substr(0, 3)) is -1
         return block
       return '<p>' + block + '</p>'
     .join("\n")
