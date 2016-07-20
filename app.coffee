@@ -152,7 +152,7 @@ ORDER BY
                   @_articles[article.id].img = data[0].thumbnail_large
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
-        article.full = if !article.full then '' else @_parse_paragraph _.template(@_parse_video(article.full)[0])({
+        article.full = if !article.full then '' else @_parse_paragraph _.template( @_parse_links( @_parse_video(article.full)[0] ) )({
           img: (id)=>
             "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" />"
         })
@@ -294,6 +294,28 @@ ORDER BY
       ids_vimeo.push(id)
       '<div class="video"><iframe width="560" height="349" src="//player.vimeo.com/video/' + id + '" frameborder="0" allowfullscreen></iframe></div>'
     [v, ids_youtube, ids_vimeo]
+
+  _parse_links: (str)->
+    infogram = []
+    str = str.replace /https\:\/\/infogr\.am\/([^#\&\?\s]*)/g, (link, id)->
+      infogram.push(id)
+      '<div class="infogram-embed" data-id="' + id + '" data-type="interactive"></div>'
+    if infogram.length is 0
+      return str
+    return str + "\n" + ("""
+
+<script>!function (e, t, n, s) {
+    var i = "InfogramEmbeds", o = e.getElementsByTagName(t), d = o[0], a = /^http:/.test(e.location) ? "http:" : "https:";
+    if (s.substr(0, 2) === '//' && (s = a + s), window[i] && window[i].initialized) {
+      window[i].process && window[i].process();
+    } else if (!e.getElementById(n)) {
+        var r = e.createElement(t);
+        r.async = 1, r.id = n, r.src = s, d.parentNode.insertBefore(r, d)
+    }
+}(document, "script", "infogram-async", "//e.infogr.am/js/dist/embed-loader-min.js");</script>
+
+      """.split("\n").join(' '))
+
 
 app = express()
 app.listen(config.port)
