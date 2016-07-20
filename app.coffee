@@ -354,6 +354,9 @@ App.data._load =>
 
   App.template.load_block('sidebar', App.data.sidebar())
   App.template.load_block('starred', App.data.starred())
+  setTimeout =>
+    App.template.load_block('starred', App.data.starred())
+  , 30000
 
   app.get ['/', '/:page(\\d+)'], (req, res)->
     App.try res, ->
@@ -386,6 +389,9 @@ App.data._load =>
     App.data._load =>
       App.template.load_block('sidebar', App.data.sidebar())
       App.template.load_block('starred', App.data.starred())
+      setTimeout =>
+        App.template.load_block('starred', App.data.starred())
+      , 30000
       res.send 'DONE'
 
   app.get '/:url', (req, res)->
