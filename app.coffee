@@ -199,12 +199,12 @@ ORDER BY
     @_tags_url = {}
     @_params.dbconnection.query """
 SELECT
-	a.`id`, a.`title`, a.`url`
+	a.`id`, a.`title`, a.`url`, a.`parent`
     , (SELECT GROUP_CONCAT(`article_id`) FROM `article_tag` WHERE `tag_id`=a.`id`) AS `articles`
 FROM
 	`tag` AS a
 ORDER BY
-	a.`order` ASC, a.`id` ASC
+	a.`parent` ASC, a.`order` ASC, a.`id` ASC
       """, (err, rows)=>
       if err
         throw err
@@ -212,12 +212,15 @@ ORDER BY
         tag.articles = if !tag.articles then [] else _.intersection(@_articles_index, tag.articles.split(',').map (c)-> parseInt(c) )
         @_tags[tag.id] = tag
         @_tags_url[tag.url] = tag.id
+        if tag.parent
+          @_tags[tag.parent].articles = _.intersection(@_articles_index, @_tags[tag.parent].articles.concat(tag.articles))
+
       callback()
 
   sidebar: ->
     {
       categories: _.orderBy _.values(@_categories), (o)-> o.order
-      tags: _.orderBy _.values(@_tags), (o)-> o.order
+      tags: _.orderBy _.values( _.filter(@_tags, (o)-> !o.parent ) ), (o)-> o.order
       lang: config.lang
     }
 
@@ -225,6 +228,13 @@ ORDER BY
     {
       articles: @_articles_starred.map (id)=> _.pick(@_articles[id], ['title', 'url', 'img_sm'])
     }
+
+  _tag_list: (ar, params = ['title', 'url'])->
+    _.flatten ar.map (id)=>
+      tags = [_.pick(@_tags[id], params)]
+      if @_tags[id].parent
+        return @_tag_list([@_tags[id].parent], params).concat(tags)
+      tags
 
   _articles_list: (ar)->
     ar.map (id)=>
@@ -279,7 +289,7 @@ ORDER BY
       description: @_articles[@_articles_url[url]].intro
       image: @_articles[@_articles_url[url]].img
       article: @_articles[@_articles_url[url]]
-      tags: @_articles[@_articles_url[url]].tags.map (id)=> _.pick(@_tags[id], ['title', 'url'])
+      tags: @_tag_list(@_articles[@_articles_url[url]].tags)
     }
 
   _parse_paragraph: (str)->

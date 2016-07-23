@@ -72,5 +72,9 @@ CREATE TABLE `article_tag` (
 ALTER TABLE `article`
 ADD COLUMN `video` VARCHAR(45) NULL DEFAULT NULL AFTER `img_sm_id`;
 
+ALTER TABLE `tag`
+ADD COLUMN `parent` INT(11) NULL DEFAULT NULL AFTER `order`;
+
+
 
 

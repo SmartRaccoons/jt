@@ -524,6 +524,30 @@
                 "editview": {
                     "show": true
                 }
+            },
+            {
+                "name": "parent",
+                "verbose": "parent",
+                "control": {
+                    "select": true
+                },
+                "oneToMany": {
+                    "table": "tag",
+                    "pk": "id",
+                    "columns": [
+                        "id",
+                        "title"
+                    ]
+                },
+                "type": "int(11)",
+                "allowNull": true,
+                "defaultValue": "NULL",
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
             }
         ],
         "mainview": {
