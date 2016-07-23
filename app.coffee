@@ -47,7 +47,7 @@ class Template
       header: _.template(@read_template('blocks/header'), {imports: {
         links: config.static.map (link)-> _.pick(link, ['title', 'url'])
       }})
-      footer: _.template(@read_template('blocks/footer'))({version: pjson.version, ganalytics: config.ganalytics})
+      footer: _.template(@read_template('blocks/footer'))({version: pjson.version, ganalytics: config.ganalytics, footer: config.lang.footer})
     }
 
   read_template: (name)->
