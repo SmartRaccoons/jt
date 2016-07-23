@@ -107,6 +107,11 @@ class Data
     @_articles_index = []
     @_articles_starred = []
     @_articles_url = []
+    vimeo_loading = 0
+    vimeo_loaded = 0
+    check = ->
+      if vimeo_loading is vimeo_loaded
+        callback()
     @_params.dbconnection.query """
 SELECT
 	a.`id`, a.`title`, a.`url`, a.`url_old`, a.`date`, a.`intro`, a.`full`, a.`starred`, a.`published`, a.`video`
@@ -143,13 +148,18 @@ ORDER BY
           if !article.img_sm and video[1][0]
             article.img_sm = 'http://img.youtube.com/vi/' + video[1][0] + '/mqdefault.jpg'
           if video[2][0]
+            vimeo_loading++
             request.get 'http://vimeo.com/api/v2/video/' + video[2][0] + '.json', (error, response, body)=>
-              if !error and response.statusCode is 200
-                data = JSON.parse(body)
-                if !article.img_sm
-                  @_articles[article.id].img_sm = data[0].thumbnail_small
-                if !article.img
-                  @_articles[article.id].img = data[0].thumbnail_large
+              if error or response.statusCode isnt 200
+                return
+              data = JSON.parse(body)
+              if !article.img_sm
+                @_articles[article.id].img_sm = data[0].thumbnail_medium
+              if !article.img
+                @_articles[article.id].img = data[0].thumbnail_large
+              vimeo_loaded++
+              if vimeo_loading is vimeo_loaded
+                check()
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
         article.full = if !article.full then '' else @_parse_paragraph _.template( @_parse_links( @_parse_video(article.full)[0] ) )({
@@ -162,7 +172,7 @@ ORDER BY
         if article.published and article.starred
           @_articles_starred.push(article.id)
         @_articles_url[article.url] = article.id
-      callback()
+      check()
 
   _load_categories: (callback)->
     @_categories = {}
@@ -354,9 +364,6 @@ App.data._load =>
 
   App.template.load_block('sidebar', App.data.sidebar())
   App.template.load_block('starred', App.data.starred())
-  setTimeout =>
-    App.template.load_block('starred', App.data.starred())
-  , 30000
 
   app.get ['/', '/:page(\\d+)'], (req, res)->
     App.try res, ->
@@ -389,9 +396,6 @@ App.data._load =>
     App.data._load =>
       App.template.load_block('sidebar', App.data.sidebar())
       App.template.load_block('starred', App.data.starred())
-      setTimeout =>
-        App.template.load_block('starred', App.data.starred())
-      , 30000
       res.send 'DONE'
 
   app.get '/:url', (req, res)->
