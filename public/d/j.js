@@ -26,7 +26,7 @@ if (category) {
 return window.location = "/sadala/" + slug(category.split("/")[0]);
 }
 if (tag) {
-return window.location = "/birka/" + slug(tag.split("/")[0]);
+return window.location = "/vieta/" + slug(tag.split("/")[0]);
 }
 })();
 
