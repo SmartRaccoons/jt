@@ -84,6 +84,36 @@
                 }
             },
             {
+                "verbose": "location",
+                "name": "location",
+                "control": {
+                    "select": true,
+                    "multiple": true
+                },
+                "type": "int(11)",
+                "allowNull": true,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                },
+                "manyToMany": {
+                    "link": {
+                        "table": "article_location",
+                        "parentPk": "article_id",
+                        "childPk": "location_id"
+                    },
+                    "ref": {
+                        "table": "location",
+                        "pk": "id",
+                        "columns": [
+                            "title"
+                        ]
+                    }
+                }
+            },
+            {
                 "name": "title",
                 "verbose": "title",
                 "control": {
@@ -529,6 +559,109 @@
                 "name": "parent",
                 "verbose": "parent",
                 "control": {
+                    "text": true
+                },
+                "type": "int(11)",
+                "allowNull": true,
+                "defaultValue": null,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
+            }
+        ],
+        "mainview": {
+            "show": true
+        },
+        "listview": {
+            "order": {
+                "order": "ASC",
+                "id": "ASC"
+            },
+            "page": 500
+        },
+        "editview": {
+            "readonly": false
+        }
+    },
+    "location": {
+        "slug": "location",
+        "table": {
+            "name": "location",
+            "pk": "id",
+            "verbose": "location"
+        },
+        "columns": [
+            {
+                "name": "id",
+                "verbose": "id",
+                "control": {
+                    "text": true
+                },
+                "type": "int(11)",
+                "allowNull": false,
+                "defaultValue": null,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": false
+                }
+            },
+            {
+                "name": "title",
+                "verbose": "title",
+                "control": {
+                    "text": true
+                },
+                "type": "varchar(255)",
+                "allowNull": false,
+                "defaultValue": null,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
+            },
+            {
+                "name": "url",
+                "verbose": "url",
+                "control": {
+                    "text": true
+                },
+                "type": "varchar(255)",
+                "allowNull": false,
+                "defaultValue": null,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
+            },
+            {
+                "name": "order",
+                "verbose": "order",
+                "control": {
+                    "number": true
+                },
+                "type": "int(11)",
+                "allowNull": true,
+                "defaultValue": "0",
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
+            },
+            {
+                "name": "parent",
+                "verbose": "parent",
+                "control": {
                     "select": true
                 },
                 "oneToMany": {
@@ -675,6 +808,74 @@
             {
                 "name": "tag_id",
                 "verbose": "tag_id",
+                "control": {
+                    "text": true
+                },
+                "type": "int(11)",
+                "allowNull": false,
+                "defaultValue": null,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
+            }
+        ],
+        "mainview": {
+            "show": true
+        },
+        "listview": {
+            "order": {},
+            "page": 25
+        },
+        "editview": {
+            "readonly": false
+        }
+    },
+    "article_location": {
+        "slug": "article_location",
+        "table": {
+            "name": "article_location",
+            "pk": "id",
+            "verbose": "article_location"
+        },
+        "columns": [
+            {
+                "name": "id",
+                "verbose": "id",
+                "control": {
+                    "text": true
+                },
+                "type": "int(11)",
+                "allowNull": false,
+                "defaultValue": null,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
+            },
+            {
+                "name": "article_id",
+                "verbose": "article_id",
+                "control": {
+                    "text": true
+                },
+                "type": "int(11)",
+                "allowNull": false,
+                "defaultValue": null,
+                "listview": {
+                    "show": true
+                },
+                "editview": {
+                    "show": true
+                }
+            },
+            {
+                "name": "location_id",
+                "verbose": "location_id",
                 "control": {
                     "text": true
                 },

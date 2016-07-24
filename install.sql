@@ -75,6 +75,32 @@ ADD COLUMN `video` VARCHAR(45) NULL DEFAULT NULL AFTER `img_sm_id`;
 ALTER TABLE `tag`
 ADD COLUMN `parent` INT(11) NULL DEFAULT NULL AFTER `order`;
 
+CREATE TABLE `location` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `order` int(11) DEFAULT '0',
+  `parent` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `article_location` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `article_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `article_location_uniq` (`article_id`,`location_id`),
+  KEY `article_id` (`article_id`),
+  KEY `location_id` (`location_id`),
+  CONSTRAINT `article_location_id_refs` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`),
+  CONSTRAINT `location_id_refs` FOREIGN KEY (`location_id`) REFERENCES `location` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `tag`
+DROP COLUMN `parent`;
+
+
+
 
 
 

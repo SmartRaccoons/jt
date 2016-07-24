@@ -85,7 +85,8 @@ class Data
     @_load_images =>
       @_load_articles =>
         @_load_categories =>
-          @_load_tags callback
+          @_load_locations =>
+            @_load_tags callback
 
   _load_images: (callback)->
     @_images = {}
@@ -120,6 +121,7 @@ SELECT
 
     , (SELECT GROUP_CONCAT(`category_id`) FROM `article_category` WHERE `article_id`=a.`id`) AS `categories`
     , (SELECT GROUP_CONCAT(`tag_id`) FROM `article_tag` WHERE `article_id`=a.`id`) AS `tags`
+    , (SELECT GROUP_CONCAT(`location_id`) FROM `article_location` WHERE `article_id`=a.`id`) AS `locations`
 FROM
 	`article` AS a
 LEFT JOIN
@@ -162,6 +164,7 @@ ORDER BY
                 check()
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
+        article.locations = if not article.locations then [] else article.locations.split(',').map (c)-> parseInt(c)
         article.full = if !article.full then '' else @_parse_paragraph _.template( @_parse_links( @_parse_video(article.full)[0] ) )({
           img: (id)=>
             "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" />"
@@ -199,12 +202,12 @@ ORDER BY
     @_tags_url = {}
     @_params.dbconnection.query """
 SELECT
-	a.`id`, a.`title`, a.`url`, a.`parent`
+	a.`id`, a.`title`, a.`url`
     , (SELECT GROUP_CONCAT(`article_id`) FROM `article_tag` WHERE `tag_id`=a.`id`) AS `articles`
 FROM
 	`tag` AS a
 ORDER BY
-	a.`parent` ASC, a.`order` ASC, a.`id` ASC
+	a.`order` ASC, a.`id` ASC
       """, (err, rows)=>
       if err
         throw err
@@ -212,15 +215,36 @@ ORDER BY
         tag.articles = if !tag.articles then [] else _.intersection(@_articles_index, tag.articles.split(',').map (c)-> parseInt(c) )
         @_tags[tag.id] = tag
         @_tags_url[tag.url] = tag.id
-        if tag.parent
-          @_tags[tag.parent].articles = _.intersection(@_articles_index, @_tags[tag.parent].articles.concat(tag.articles))
+
+      callback()
+
+  _load_locations: (callback)->
+    @_locations = {}
+    @_locations_url = {}
+    @_params.dbconnection.query """
+SELECT
+	a.`id`, a.`title`, a.`url`, a.`parent`
+    , (SELECT GROUP_CONCAT(`article_id`) FROM `article_location` WHERE `location_id`=a.`id`) AS `articles`
+FROM
+	`location` AS a
+ORDER BY
+	a.`parent` ASC, a.`order` ASC, a.`id` ASC
+      """, (err, rows)=>
+      if err
+        throw err
+      rows.forEach (location)=>
+        location.articles = if !location.articles then [] else _.intersection(@_articles_index, location.articles.split(',').map (c)-> parseInt(c) )
+        @_locations[location.id] = location
+        @_locations_url[location.url] = location.id
+        if location.parent
+          @_locations[location.parent].articles = _.intersection(@_articles_index, @_locations[location.parent].articles.concat(location.articles))
 
       callback()
 
   sidebar: ->
     {
       categories: _.orderBy _.values(@_categories), (o)-> o.order
-      tags: _.orderBy _.values( _.filter(@_tags, (o)-> !o.parent ) ), (o)-> o.order
+      locations: _.orderBy _.values( _.filter(@_locations, (o)-> !o.parent ) ), (o)-> o.order
       lang: config.lang
     }
 
@@ -229,12 +253,12 @@ ORDER BY
       articles: @_articles_starred.map (id)=> _.pick(@_articles[id], ['title', 'url', 'img_sm'])
     }
 
-  _tag_list: (ar, params = ['title', 'url'])->
+  _location_list: (ar, params = ['title', 'url'])->
     _.flatten ar.map (id)=>
-      tags = [_.pick(@_tags[id], params)]
-      if @_tags[id].parent
-        return @_tag_list([@_tags[id].parent], params).concat(tags)
-      tags
+      ob = [_.pick(@_locations[id], params)]
+      if @_locations[id].parent
+        return @_location_list([@_locations[id].parent], params).concat(ob)
+      ob
 
   _articles_list: (ar)->
     ar.map (id)=>
@@ -278,6 +302,16 @@ ORDER BY
       description: config.lang.description_tag(@_tags[id].title)
     }
 
+  location: (url, page)->
+    id = @_locations_url[url]
+    if !id
+      throw new Error404
+    _.extend @list(@_locations[id].articles, page), {
+      url: "/#{config.lang.location}/#{url}"
+      title: @_locations[id].title
+      description: config.lang.description_location(@_locations[id].title)
+    }
+
   article: (url, published=true)->
     if !@_articles_url[url]
       throw new Error404
@@ -289,7 +323,8 @@ ORDER BY
       description: @_articles[@_articles_url[url]].intro
       image: @_articles[@_articles_url[url]].img
       article: @_articles[@_articles_url[url]]
-      tags: @_tag_list(@_articles[@_articles_url[url]].tags)
+      tags: @_articles[@_articles_url[url]].tags.map (t)=> _.pick(@_tags[t], ['title', 'url'])
+      locations: @_location_list(@_articles[@_articles_url[url]].locations)
     }
 
   _parse_paragraph: (str)->
@@ -386,6 +421,10 @@ App.data._load =>
   app.get ["/#{config.lang.tag}/:tag", "/#{config.lang.tag}/:tag/:page(\\d+)"], (req, res)->
     App.try res, ->
       res.send App.template.index App.data.tag(req.params.tag, parseInt(req.params.page or 1))
+
+  app.get ["/#{config.lang.location}/:location", "/#{config.lang.location}/:location/:page(\\d+)"], (req, res)->
+    App.try res, ->
+      res.send App.template.index App.data.location(req.params.location, parseInt(req.params.page or 1))
 
   config['static'].forEach (page)=>
     app.get "/#{page.url}", (req, res)->

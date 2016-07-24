@@ -12,10 +12,11 @@
         <a class="social-fb" href="https://www.facebook.com/<%= lang.connect_fb %>" title="<%= lang.connect_fb_title %>"><%= lang.connect_fb_title %></a>
         <a class="social-tw" href="https://twitter.com/<%= lang.connect_tw %>" title="<%= lang.connect_tw_title %>"><%= lang.connect_tw_title %></a>
     </nav>
-    <nav class="tag"><div>
-        <h2><%= lang.tags %></h2>
-        <% tags.forEach(function (tag) { %>
-            <a href="/birka/<%= tag.url %>" title="<%= tag.title %>"><%= tag.title %></a>
-        <% }) %>
-    </div></nav>
+    <nav class="locations">
+        <ul>
+            <% locations.forEach(function (location) { %>
+                <li><a href="/<%= lang.location %>/<%= location.url %>" title="<%= location.title %>"><%= location.title %></a></li>
+            <% }) %>
+        </ul>
+    </nav>
 </aside>

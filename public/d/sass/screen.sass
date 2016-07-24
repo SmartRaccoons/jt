@@ -62,8 +62,9 @@ body
     font-size: 16px
   +m-large
     font-size: 18px
-body>div
-  padding: 1em
+#container
+  padding: 1em 1em 4em
+  min-height: 100%
   >div
     position: relative
     +m-large
@@ -151,7 +152,7 @@ aside
     width: 280px
     right: 0
     top: 0
-  .category, .tag
+  .category, .locations
     +box-style
   h2
     margin: 0 0 0.5em
@@ -159,19 +160,26 @@ aside
     font-weight: normal
     text-align: center
     font-size: 1.2em
-  .category
+  .category, .locations
     ul
       text-align: center
     li
       display: inline
-      margin: 0.5em 1em
+      margin: 0 1em
       +m-large
         display: block
         text-align: left
     a
       text-decoration: none
+  .category
+    li
+      margin: 0.5em 1em
+    a
       font-weight: bold
       font-size: 1.7em
+  .locations
+    a
+      font-size: 1em
   .social
     background: #f5f4f4
     border: 1px solid #ffffff
@@ -215,14 +223,14 @@ section
   img
     max-width: 100%
 
-.tags
+.article-category
   margin: 1em 0
   font-size: 0.8em
   a
     text-decoration: none
     margin: 0 0.5em
 
-.shares
+.article-shares
   margin: 1em 0
   line-height: 0.7
   #draugiemLike

@@ -119,24 +119,24 @@ class Fetch
       tag_slug = helper.slug(tag)
       found = (tag_id)->
         save = ->
-          dbconnection.query 'INSERT INTO `article_tag` SET ? ', {tag_id: tag_id, article_id: article_id}, (err, rows)->
+          dbconnection.query 'INSERT INTO `article_location` SET ? ', {tag_id: tag_id, article_id: article_id}, (err, rows)->
             if err
               throw err
             check()
-        dbconnection.query 'SELECT `id` FROM `article_tag` WHERE `tag_id`= ? AND `article_id`=?', [tag_id, article_id], (err, rows)->
+        dbconnection.query 'SELECT `id` FROM `article_location` WHERE `location_id`= ? AND `article_id`=?', [tag_id, article_id], (err, rows)->
           if err
             throw err
           if rows.length > 0
             return check()
           return save()
       dbconnection.query """
-        SELECT `id` FROM `tag` WHERE `url`=?
+        SELECT `id` FROM `location` WHERE `url`=?
       """, [tag_slug], (err, rows)->
         if err
           throw err
         if rows.length > 0
           return found(rows[0].id)
-        dbconnection.query 'INSERT INTO `tag` SET ?', {title: tag, url: tag_slug}, (err, rows)->
+        dbconnection.query 'INSERT INTO `location` SET ?', {title: tag, url: tag_slug}, (err, rows)->
           if err
             throw err
           found(rows.insertId)

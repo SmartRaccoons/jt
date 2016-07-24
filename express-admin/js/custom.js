@@ -45,7 +45,7 @@ $(document).ready(function() {
         if ($('input[type=file][name="'+ $(this).attr('name') +'"]').length > 0) {
             return false;
         }
-        if ($(this).val()) {
+        if ($(this).val() && window.location.href.indexOf('article') > -1) {
             update_url($(this));
         }
         $(this).focus(function () {

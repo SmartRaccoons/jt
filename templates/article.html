@@ -1,5 +1,5 @@
 <%= header({url: url, title: title, description: description, image: image, lang: lang, version: version})%>
-<div>
+<div id="container">
 
     <%= starred %>
     <div>
@@ -8,16 +8,24 @@
                 <small><%= lang.date(article.date) %></small></h1>
             <%= article.full %>
         </section>
+        <% if (locations.length > 0) { %>
+            <nav class="article-category">
+                <%= lang.locations %>:
+                <% locations.forEach(function (t) { %>
+                    <a href="/<%= lang.location %>/<%= t.url %>" title="<%- t.title %>"><%- t.title %></a>
+                <% }) %>
+            </nav>
+        <% } %>
         <% if (tags.length > 0) { %>
-        <nav class="tags">
-            <%= lang.tags %>:
-            <% tags.forEach(function (t) { %>
-                <a href="/birka/<%= t.url %>" title="<%- t.title %>"><%- t.title %></a>
-            <% }) %>
-        </nav>
+            <nav class="article-category">
+                <%= lang.tags %>:
+                <% tags.forEach(function (t) { %>
+                    <a href="/<%= lang.tag %>/<%= t.url %>" title="<%- t.title %>"><%- t.title %></a>
+                <% }) %>
+            </nav>
 
         <% } %>
-        <nav class="shares">
+        <nav class="article-shares">
 
             <div id="draugiemLike"></div>
 

@@ -48,6 +48,8 @@ exports.demo_page = """
 """
 
 exports.lang = {
+  location: 'vieta'
+  locations: 'Vietas'
   tag: 'birka'
   category: 'sadala'
   title: 'jaunatelpa.lv'
@@ -76,7 +78,9 @@ exports.lang = {
   description_category: (title)->
     "Sadaļa #{title}"
   description_tag: (title)->
-    "Birka #{title}"
+    "Ziņas birka #{title}"
+  description_location: (title)->
+    "Ziņas no #{title}"
   url: 'http://jaunatelpa.lv'
   connect: 'Draudzējies ar mums'
   connect_fb: 'JaunaTelpa'
