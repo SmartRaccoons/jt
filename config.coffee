@@ -49,7 +49,7 @@ exports.demo_page = """
 
 exports.lang = {
   location: 'vieta'
-  locations: 'Vietas'
+  locations: 'Vieta'
   tag: 'birka'
   category: 'sadala'
   title: 'jaunatelpa.lv'
