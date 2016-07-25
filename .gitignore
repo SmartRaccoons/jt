@@ -17,6 +17,7 @@ express-admin/custom.json
 !express-admin/custom.json.coffee
 express-admin/config.json
 !express-admin/config.json.coffee
+!express-admin/js/panel.js
 !express-admin/js/custom.js
 !wix-copy/helper.js
 public/i

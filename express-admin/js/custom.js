@@ -69,5 +69,107 @@ $(document).ready(function() {
         }
     });
 
+    var Editor = (function() {
+        function Editor(el) {
+            this.el = el;
+        }
+
+        Editor.prototype.select = function () {
+            this.start = this.el.selectionStart;
+            this.end = this.el.selectionEnd;
+            return this.el.value.substring(this.start, this.end);
+        };
+
+        Editor.prototype.set = function (w) {
+            this.el.focus();
+            this.el.selectionStart = w;
+            this.el.selectionEnd = w;
+        };
+
+        Editor.prototype.fit_with = function (w, prefix) {
+            var text = this.select();
+            var rep = (this.start > 0 ? prefix : '') + w;
+            this.el.value = this.el.value.substring(0, this.start) + rep + this.el.value.substring(this.end);
+            this.set(this.start + rep.length);
+        };
+
+        Editor.prototype.fit = function (tag, attr, tag_end, prefix) {
+            var text = this.select();
+            if (!tag_end) {
+                tag_end = '</' + tag + '>';
+            }
+            var tag_start = (this.start > 0 ? prefix || '' : '') + '<' + tag + (attr || '') + '>' + text;
+            this.el.value = this.el.value.substring(0, this.start) +
+                tag_start + tag_end +
+                this.el.value.substring(this.end);
+            this.set(this.start + tag_start.length);
+        };
+
+
+        return Editor;
+    })();
+
+    $('textarea.html-tag').each(function () {
+        $(this).height(300);
+        var c = $('<div>').insertBefore($(this));
+        var editor = new Editor($(this)[0]);
+        [
+            $('<a href="#" style="font-weight: bold">bold</a> ').click(function () {
+            editor.fit('strong');
+            return false;
+            }),
+            $('<a href="#" style="font-style: italic">italic</a> ').click(function () {
+                editor.fit('i');
+                return false;
+            }),
+            $('<a href="#" style="text-decoration: line-through">strike</a>').click(function () {
+                editor.fit('s');
+                return false;
+            }),
+            $('<a href="#" style="text-decoration: underline">underline</a> ').click(function () {
+                editor.fit('u');
+                return false;
+            }),
+            $('<a href="#">h2</a> ').click(function () {
+                editor.fit('h2');
+                return false;
+            }),
+            $('<a href="#">h3</a> ').click(function () {
+                editor.fit('h3');
+                return false;
+            }),
+            $('<a href="#">h4</a> ').click(function () {
+                editor.fit('h4');
+                return false;
+            }),
+            $('<a href="#">h5</a> ').click(function () {
+                editor.fit('h5');
+                return false;
+            }),
+            $('<a href="#">h6</a> ').click(function () {
+                editor.fit('h6');
+                return false;
+            }),
+            $('<a href="#">list</a> ').click(function () {
+                editor.fit("ul>\n   <li", '', "</li>\n</ul>\n", "\n");
+                return false;
+            }),
+            $('<a href="#">ordered list</a> ').click(function () {
+                editor.fit("ol>\n   <li", '', "</li>\n</ol>\n", "\n");
+                return false;
+            }),
+            $('<a href="#">link</a>').click(function () {
+                editor.fit('a', ' href="' + prompt('Link', 'http://') + '"');
+                return false;
+            }),
+            $('<a href="#">image</a>').click(function () {
+                editor.fit_with("<%= img(" + prompt('Image ID', '') + ") %>\n", "\n");
+                return false;
+            })
+        ].forEach(function (link) {
+            c.append(link);
+            c.append(' | ');
+        });
+    });
 
 });

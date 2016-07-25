@@ -181,7 +181,8 @@
                 "name": "intro",
                 "verbose": "intro",
                 "control": {
-                    "textarea": true
+                    "textarea": true,
+                    "editor": "html-tag"
                 },
                 "type": "text",
                 "allowNull": false,
@@ -197,7 +198,8 @@
                 "name": "full",
                 "verbose": "full",
                 "control": {
-                    "textarea": true
+                    "textarea": true,
+                    "editor": "html-tag"
                 },
                 "type": "text",
                 "allowNull": false,
