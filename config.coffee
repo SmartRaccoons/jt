@@ -89,7 +89,7 @@ exports.lang = {
   connect_dr_title: 'seko draugiem.lv lapā'
   connect_tw: 'JaunaTelpa'
   connect_tw_title: 'seko twitter.com lapā'
-  footer: '© 2016 JaunaTelpa.lv. Materiāla izmantošana, sazināties <a href="mailto:jaunatelpa@gmail.com">jaunatelpa@gmail.com</a>'
+  footer: '© 2016 JaunaTelpa.lv. Materiāla izmantošanā, sazināties <a href="mailto:jaunatelpa@gmail.com">jaunatelpa@gmail.com</a>'
 }
 exports.ganalytics = 'UA-xxxxx-x'
 exports.error = {
