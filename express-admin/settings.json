@@ -554,22 +554,6 @@
                 "editview": {
                     "show": true
                 }
-            },
-            {
-                "name": "parent",
-                "verbose": "parent",
-                "control": {
-                    "text": true
-                },
-                "type": "int(11)",
-                "allowNull": true,
-                "defaultValue": null,
-                "listview": {
-                    "show": true
-                },
-                "editview": {
-                    "show": true
-                }
             }
         ],
         "mainview": {
