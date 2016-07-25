@@ -46,7 +46,8 @@ exports.clean = function (el) {
             }
         });
         el.find('img').each(function () {
-            $(this).before('<img src="' + $(this).attr('src') + '" alt="' + $(this).attr('alt') + '" />');
+            var title = $(this).attr('alt') || $(this).closest('[title]').attr('title');
+            $(this).before('<img src="' + $(this).attr('src') + '" alt="' + title + '  alt="' + title + '" />');
             $(this).remove();
         });
         el.find('br').each(function () {

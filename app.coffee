@@ -117,7 +117,9 @@ class Data
 SELECT
 	a.`id`, a.`title`, a.`url`, a.`url_old`, a.`date`, a.`intro`, a.`full`, a.`starred`, a.`published`, a.`video`
     , im1.`url` AS img
+    , im1.`title` AS img_title
     , im2.`url` AS img_sm
+    , im2.`title` AS img_sm_title
 
     , (SELECT GROUP_CONCAT(`category_id`) FROM `article_category` WHERE `article_id`=a.`id`) AS `categories`
     , (SELECT GROUP_CONCAT(`tag_id`) FROM `article_tag` WHERE `article_id`=a.`id`) AS `tags`
@@ -167,7 +169,7 @@ ORDER BY
         article.locations = if not article.locations then [] else article.locations.split(',').map (c)-> parseInt(c)
         article.full = if !article.full then '' else @_parse_paragraph _.template( @_parse_links( @_parse_video(article.full)[0] ) )({
           img: (id)=>
-            "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" />"
+            "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" title=\"#{@_images[id].title}\" />"
         })
         @_articles[article.id] = article
         if article.published
@@ -250,7 +252,7 @@ ORDER BY
 
   starred: ->
     {
-      articles: @_articles_starred.map (id)=> _.pick(@_articles[id], ['title', 'url', 'img_sm'])
+      articles: @_articles_starred.map (id)=> _.pick(@_articles[id], ['title', 'url', 'img_sm', 'img_sm_title'])
     }
 
   _location_list: (ar, params = ['title', 'url'])->
@@ -262,7 +264,7 @@ ORDER BY
 
   _articles_list: (ar)->
     ar.map (id)=>
-      article = _.pick(@_articles[id], ['title', 'date', 'url', 'intro', 'img', 'video'])
+      article = _.pick(@_articles[id], ['title', 'date', 'url', 'intro', 'img', 'img_title', 'video'])
       article.intro = article.intro.replace("\n", "<br />\n")
       article
 

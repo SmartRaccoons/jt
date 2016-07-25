@@ -12,7 +12,7 @@
                 <% if (article.video) { %>
                     <%= article.video %>
                 <% } else { %>
-                    <a href="/<%= article.url %>" title="<%- article.title %>"><img alt="<%- article.title %>" src="<%= article.img %>" /></a>
+                    <a href="/<%= article.url %>" title="<%- article.title %>"><img alt="<%- article.img_title || article.title %>" title="<%- article.img_title || article.title %>" src="<%= article.img %>" /></a>
                 <% } %>
                 <p>
                     <%= article.intro %>

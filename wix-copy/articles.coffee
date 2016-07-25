@@ -88,6 +88,7 @@ class Fetch
         }
         if type is 'photo'
            article.img_wix = $(this).find('[data-proxy-name="Image"] img').attr('src')
+           article.img_wix_title = $(this).find('[data-proxy-name="Image"] img').closest('[title]').attr('title')
         if type is 'video'
            article.video = 'https://www.youtube.com/watch?v=' + $(this).find('iframe').attr('src').split('youtube.com/embed/')[1].split('?')[0]
         intro = $(this).find('[id$="_textrichTextContainer"]')
@@ -155,8 +156,9 @@ class Fetch
             throw err
           callback()
       if article.img_wix
-        @save_image article.img_wix, article.url, article.title, true, (image_id)->
+        @save_image article.img_wix, article.url, article.img_wix_title or article.title, true, (image_id)->
           delete article.img_wix
+          delete article.img_wix_title
           article.img_id = image_id
           save(article)
       else

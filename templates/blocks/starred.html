@@ -2,7 +2,7 @@
 <nav class="starred">
     <ul>
     <% articles.forEach(function (article) {
-        %><li><a href="/<%= article.url %>" title="<%- article.title %>"><img src="<%= article.img_sm %>" alt="<%- article.title %>" /><%- article.title %></a></li><%
+        %><li><a href="/<%= article.url %>" title="<%- article.title %>"><img src="<%= article.img_sm %>" title="<%- article.img_sm_title || article.title %>" alt="<%- article.img_sm_title || article.title %>" /><%- article.title %></a></li><%
     }) %>
     </ul>
 </nav>
