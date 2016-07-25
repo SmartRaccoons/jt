@@ -465,6 +465,7 @@ App.data._load =>
 
   app.get "/#{config.hiddenReload}", (req, res)->
     res.header('Access-Control-Allow-Origin', '*')
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     App.data._load =>
       console.info 'Reloaded'
       App.template.load_block('sidebar', App.data.sidebar())
