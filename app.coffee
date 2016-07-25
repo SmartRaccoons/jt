@@ -1,6 +1,7 @@
 config = require('./config')
 request = require('request')
 express = require('express')
+body_parser = require('body-parser')
 _ = require('lodash')
 fs = require('fs')
 pjson = require('./package.json')
@@ -167,10 +168,7 @@ ORDER BY
         article.categories = if not article.categories then [] else article.categories.split(',').map (c)-> parseInt(c)
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
         article.locations = if not article.locations then [] else article.locations.split(',').map (c)-> parseInt(c)
-        article.full = if !article.full then '' else @_parse_paragraph _.template( @_parse_links( @_parse_video(article.full)[0] ) )({
-          img: (id)=>
-            "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" title=\"#{@_images[id].title}\" />"
-        })
+        article.full = @_parse_content(article.full)
         @_articles[article.id] = article
         if article.published
           @_articles_index.push(article.id)
@@ -373,10 +371,22 @@ ORDER BY
 
       """.split("\n").join(' '))
 
+  _parse_content: (str)->
+    if !str
+      return ''
+    @_parse_paragraph _.template( @_parse_links( @_parse_video(str)[0] ) )({
+      img: (id)=>
+        if !@_images[id]
+          return "<img src=\"/d/images/dummy-700x400.png\" />"
+        "<img src=\"#{@_images[id].url}\" alt=\"#{@_images[id].title}\" title=\"#{@_images[id].title}\" />"
+    })
+
 
 app = express()
 app.listen(config.port)
-
+app.use(body_parser.urlencoded({
+  extended: true
+}))
 
 if config.development
   require('./app_dev').init(app)
@@ -436,15 +446,27 @@ App.data._load =>
         description: page.description
       }, page))
 
-  app.get '/demo-view-page', (req, res)->
-    res.send App.template.static({
-      url: "/demo-view-page"
-      title: 'Demo view page'
-      description: config.demo_page
+  app.post '/demo-view-page', (req, res)->
+    title = req.body.preview_title
+    full = req.body.preview_full
+    res.send App.template.article({
+      url: "/"
+      title: title
+      description: ''
+      image: ''
+      article: {
+        title: title
+        date: new Date()
+        full: App.data._parse_content(full)
+      }
+      tags: []
+      locations: []
     })
 
   app.get "/#{config.hiddenReload}", (req, res)->
+    res.header('Access-Control-Allow-Origin', '*')
     App.data._load =>
+      console.info 'Reloaded'
       App.template.load_block('sidebar', App.data.sidebar())
       App.template.load_block('starred', App.data.starred())
       res.send 'DONE'

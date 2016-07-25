@@ -181,8 +181,7 @@
                 "name": "intro",
                 "verbose": "intro",
                 "control": {
-                    "textarea": true,
-                    "editor": "html-tag"
+                    "textarea": true
                 },
                 "type": "text",
                 "allowNull": false,

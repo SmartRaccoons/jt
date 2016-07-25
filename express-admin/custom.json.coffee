@@ -6,6 +6,7 @@ fs.writeFileSync __dirname + '/custom.json' , """{
       "local": {
         "path": "<%= local %>",
         "js": [
+          "/js/config.js",
           "/js/custom.js"
         ]
       }
