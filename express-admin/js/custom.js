@@ -1,3 +1,14 @@
+$.holdReady( true );
+document.addEventListener("DOMContentLoaded", function(event) {
+    $('select[name$="[img_id]"], select[name$="[img_sm_id]"]').each(function () {
+        var c = $(this);
+        c.find('option').each(function () {
+            $(this).prependTo(c);
+        });
+    });
+    $.holdReady( false );
+});
+
 $(document).ready(function() {
 
     function twoDigits(d) {
