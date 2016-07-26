@@ -87,7 +87,7 @@ class Fetch
             url_old: url_old
         }
         if type is 'photo'
-           article.img_wix = $(this).find('[data-proxy-name="Image"] img').attr('src')
+           article.img_wix = $(this).find('[data-proxy-name="Image"] img').attr('src').split('/v1/fill')[0]
            article.img_wix_title = $(this).find('[data-proxy-name="Image"] img').closest('[title]').attr('title')
         if type is 'video'
            article.video = 'https://www.youtube.com/watch?v=' + $(this).find('iframe').attr('src').split('youtube.com/embed/')[1].split('?')[0]
