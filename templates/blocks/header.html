@@ -11,14 +11,14 @@
     <meta property="og:url" content="<%= lang.url %><%= url %>" />
     <meta property="og:title" content="<%- title || lang.title %>" />
     <meta property="og:description" content="<%- description || lang.description %>" />
-    <meta property="og:image" content="<%= image || lang.image %>" />
+    <meta property="og:image" content="<%= lang.url %><%= image || lang.image %>" />
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@<%= lang.connect_tw %>">
     <meta name="twitter:url" content="<%= lang.url %><%= url %>">
     <meta name="twitter:title" content="<%- title || lang.title %>">
     <meta name="twitter:description" content="<%- description || lang.description %>">
-    <meta name="twitter:image" content="<%= image || lang.image %>">
+    <meta name="twitter:image" content="<%= lang.url %><%= image || lang.image %>">
 
 </head>
 <body>

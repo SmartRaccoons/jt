@@ -3,7 +3,7 @@ exports.port = 9099
 exports.port_admin = 9100
 
 exports.static = [{
-  url: 'par-mums'
+  url: '/par-mums'
   title: 'Par mums'
   description: """
 <img src='/d/images/jaunatelpa-cube.png' alt='jaunatelpa.lv' style='float:left' />
@@ -44,7 +44,7 @@ exports.lang = {
   next: 'Jaunākas ziņas'
   read_more: 'Lasīt vairāk'
   description: 'Neatkarīga JAUNA (ziņu) TELPA.'
-  image: 'http://jaunatelpa.lv/d/images/jaunatelpa.png'
+  image: '/d/images/jaunatelpa.png'
   description_category: (title)->
     "Sadaļa #{title}"
   description_tag: (title)->

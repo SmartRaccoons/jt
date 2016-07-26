@@ -451,12 +451,8 @@ App.data._load =>
       res.send App.template.index App.data.location(req.params.location, parseInt(req.params.page or 1))
 
   config['static'].forEach (page)=>
-    app.get "/#{page.url}", (req, res)->
-      res.send App.template.static(_.extend({
-        url: "/#{page.url}"
-        title: page.title
-        description: page.description
-      }, page))
+    app.get "#{page.url}", (req, res)->
+      res.send App.template.static(page)
 
   app.post '/demo-view-page', (req, res)->
     title = req.body.preview_title
