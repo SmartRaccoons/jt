@@ -15,6 +15,11 @@ exports.slug = function (text) {
 };
 exports.clean = function (el) {
     var clean = function () {
+        el.find('img').each(function () {
+            var title = $(this).attr('alt') || $(this).closest('[title]').attr('title');
+            $(this).before('<img src="' + $(this).attr('src') + '" alt="' + title + '"  title="' + title + '" />');
+            $(this).remove();
+        });
         el.find('p').each(function () {
             var cont = $(this).html().trim();
             if (cont) {
@@ -44,11 +49,6 @@ exports.clean = function (el) {
                 $(this).before("\n https://www.youtube.com/watch?v=" + $(this).attr('src').split('youtube.com/embed/')[1].split('?')[0] + "\n");
                 $(this).remove();
             }
-        });
-        el.find('img').each(function () {
-            var title = $(this).attr('alt') || $(this).closest('[title]').attr('title');
-            $(this).before('<img src="' + $(this).attr('src') + '" alt="' + title + '  alt="' + title + '" />');
-            $(this).remove();
         });
         el.find('br').each(function () {
             $(this).before("\n");

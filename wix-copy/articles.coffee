@@ -120,7 +120,7 @@ class Fetch
       tag_slug = helper.slug(tag)
       found = (tag_id)->
         save = ->
-          dbconnection.query 'INSERT INTO `article_location` SET ? ', {tag_id: tag_id, article_id: article_id}, (err, rows)->
+          dbconnection.query 'INSERT INTO `article_location` SET ? ', {location_id: tag_id, article_id: article_id}, (err, rows)->
             if err
               throw err
             check()

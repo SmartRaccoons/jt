@@ -1,7 +1,7 @@
 @import "compass"
 
 
-$breakpoints: (tiny: 320px, small: 480px, normal: 640px, large: 800px, wide: 1080px)
+$breakpoints: (tiny: 320px, small: 480px, normal: 640px, large: 900px, wide: 1080px)
 
 =m-default
   @content
@@ -52,23 +52,28 @@ html
 
 body
   position: relative
-  font: normal 10px/1.2 arial
+  font: normal 12px/1.2 arial
   color: #030303
-  +m-tiny
-    font-size: 12px
   +m-small
     font-size: 14px
   +m-normal
     font-size: 16px
-  +m-large
-    font-size: 18px
 #container
   padding: 1em 1em 4em
   min-height: 100%
   >div
     position: relative
+    &:after
+      visibility: hidden
+      display: block
+      font-size: 0
+      content: " "
+      clear: both
+      height: 0
+  .container-block
     +m-large
-      padding-right: 300px
+      width: 70%
+      float: left
 header > div, body > div, footer > div
   max-width: 1000px
   margin: 0 auto
@@ -148,10 +153,8 @@ footer
 
 aside
   +m-large
-    position: absolute
-    width: 280px
-    right: 0
-    top: 0
+    width: 28%
+    float: right
   .category, .locations
     +box-style
   h2
@@ -181,6 +184,7 @@ aside
     a
       color: #414141
       font-size: 1em
+      white-space: nowrap
   .social
     background: #f5f4f4
     border: 1px solid #ffffff
@@ -199,17 +203,6 @@ aside
     +icons-sprite(tw)
   .social-dr
     +icons-sprite(dr)
-  .tag
-    >div
-      padding-left: 1em
-      padding-right: 1em
-    a
-      text-decoration: none
-      margin-right: 1em
-      font-size: 0.8em
-      white-space: nowrap
-      &:hover
-        text-decoration: underline
 
 .list
   h1
@@ -263,7 +256,7 @@ h1
   font-size: 2em
   margin: 1em 0
   padding: 0
-  small
+  time
     display: block
     font-size: 0.3em
     font-weight: normal
