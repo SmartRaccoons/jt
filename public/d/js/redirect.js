@@ -18,7 +18,7 @@
     if (hash.substr(0, 2) !== '#!') {
         return;
     }
-    hash = hash.substr(2);
+    hash = decodeURI(hash.substr(2));
     if (hash.indexOf('blank/cxqm/category/Ziņas') > -1 || hash.indexOf('blank/cxqm/page/') > -1) {
         return window.location = '/';
     }
