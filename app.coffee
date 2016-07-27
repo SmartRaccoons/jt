@@ -11,14 +11,6 @@ mysql = require('mysql')
 _.extend(config, require('./config.local'))
 
 
-dbconnection = mysql.createConnection({
-  host     : config.dbconnection.host or 'localhost'
-  user     : config.dbconnection.user
-  password : config.dbconnection.pass
-  database : config.dbconnection.name
-})
-dbconnection.connect()
-
 email   = require('emailjs').server.connect({
   user: config.support.email,
   password: config.support.pass,
@@ -79,15 +71,22 @@ class Template
 class Data
   per_page: 10
 
-  constructor: (params)->
-    @_params = params
-
   _load: (callback)->
+    @_params = {}
+    @_params.dbconnection = mysql.createConnection({
+      host     : config.dbconnection.host or 'localhost'
+      user     : config.dbconnection.user
+      password : config.dbconnection.pass
+      database : config.dbconnection.name
+    })
+    @_params.dbconnection.connect()
     @_load_images =>
       @_load_articles =>
         @_load_categories =>
           @_load_locations =>
-            @_load_tags callback
+            @_load_tags =>
+              @_params.dbconnection.end()
+              callback()
 
   _load_images: (callback)->
     @_images = {}
@@ -416,7 +415,7 @@ else
 App = {
   template: new Template({dirname: __dirname})
 
-  data: new Data({dbconnection: dbconnection})
+  data: new Data()
 
   try: (res, fn)->
     try
