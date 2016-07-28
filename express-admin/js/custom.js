@@ -18,7 +18,7 @@ $(document).ready(function() {
     }
 
     Date.prototype.toMysqlFormat = function() {
-        return this.getUTCFullYear() + "-" + twoDigits(1 + this.getUTCMonth()) + "-" + twoDigits(this.getUTCDate()) + " " + twoDigits(this.getUTCHours()) + ":" + twoDigits(this.getUTCMinutes()) + ":" + twoDigits(this.getUTCSeconds());
+        return this.getFullYear() + "-" + twoDigits(1 + this.getMonth()) + "-" + twoDigits(this.getDate()) + " " + twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes()) + ":" + twoDigits(this.getSeconds());
     };
 
     var url = window.location.protocol+'//'+window.location.hostname.split('puorvaldeiba.')[1];
@@ -39,11 +39,33 @@ $(document).ready(function() {
         });
     })();
     $('input[name$="[date]"]').each(function (el) {
+        var el = $(this);
+        var n = function () {
+            el.val(new Date().toMysqlFormat());
+            return false;
+        };
         if (!$(this).val()) {
-            $(this).val(new Date().toMysqlFormat());
+            n();
         }
+        $('<a href="#">now</a>').click(n).insertAfter($(this));
     });
-
+    (function () {
+        if (window.location.pathname !== '/article') {
+            return;
+        }
+        $('table tbody tr').each(function () {
+            var el = $(this);
+            var c = function (color) {
+                el.css('background-color', color);
+            };
+            if ($(this).find('td:nth-last-child(2)').text().trim() == 'False'){
+                c('#d6a5b9');
+            }
+            if ($(this).find('td:nth-last-child(1)').text().trim() == 'True'){
+                c('#8c95ab');
+            }
+        });
+    })();
     var slug = function (text) {
         var txt =  text.toString().trim().toLowerCase();
         var from = "āčēģīķļņšūž";
