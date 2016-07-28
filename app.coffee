@@ -89,7 +89,7 @@ class Data
               callback()
 
   _load_images: (callback)->
-    @_images = {}
+    images = {}
     @_params.dbconnection.query """
       SELECT
         a.`id`, a.`title`, a.`url`
@@ -100,18 +100,23 @@ class Data
         throw err
       rows.forEach (image)=>
         image.url = '/i/' + image.url
-        @_images[image.id] = image
+        images[image.id] = image
+      @_images = images
       callback()
 
   _load_articles: (callback)->
-    @_articles = {}
-    @_articles_index = []
-    @_articles_starred = []
-    @_articles_url = []
+    articles = {}
+    articles_index = []
+    articles_starred = []
+    articles_url = []
     vimeo_loading = 0
     vimeo_loaded = 0
-    check = ->
+    check = =>
       if vimeo_loading is vimeo_loaded
+        @_articles = articles
+        @_articles_index = articles_index
+        @_articles_starred = articles_starred
+        @_articles_url = articles_url
         callback()
     @_params.dbconnection.query """
 SELECT
@@ -158,9 +163,9 @@ ORDER BY
                 return
               data = JSON.parse(body)
               if !article.img_sm
-                @_articles[article.id].img_sm = data[0].thumbnail_medium
+                articles[article.id].img_sm = data[0].thumbnail_medium
               if !article.img
-                @_articles[article.id].img = data[0].thumbnail_large
+                articles[article.id].img = data[0].thumbnail_large
               vimeo_loaded++
               if vimeo_loading is vimeo_loaded
                 check()
@@ -168,17 +173,17 @@ ORDER BY
         article.tags = if not article.tags then [] else article.tags.split(',').map (c)-> parseInt(c)
         article.locations = if not article.locations then [] else article.locations.split(',').map (c)-> parseInt(c)
         article.full = @_parse_content(article.full)
-        @_articles[article.id] = article
+        articles[article.id] = article
         if article.published
-          @_articles_index.push(article.id)
-        if article.published and article.starred and @_articles_starred.length < 5
-          @_articles_starred.push(article.id)
-        @_articles_url[article.url] = article.id
+          articles_index.push(article.id)
+        if article.published and article.starred and articles_starred.length < 5
+          articles_starred.push(article.id)
+        articles_url[article.url] = article.id
       check()
 
   _load_categories: (callback)->
-    @_categories = {}
-    @_categories_url = {}
+    categories = {}
+    categories_url = {}
     @_params.dbconnection.query """
 SELECT
 	a.`id`, a.`title`, a.`url`
@@ -192,13 +197,15 @@ ORDER BY
         throw err
       rows.forEach (category)=>
         category.articles = if !category.articles then [] else _.intersection(@_articles_index, category.articles.split(',').map (c)-> parseInt(c) )
-        @_categories[category.id] = category
-        @_categories_url[category.url] = category.id
+        categories[category.id] = category
+        categories_url[category.url] = category.id
+      @_categories = categories
+      @_categories_url = categories_url
       callback()
 
   _load_tags: (callback)->
-    @_tags = {}
-    @_tags_url = {}
+    tags = {}
+    tags_url = {}
     @_params.dbconnection.query """
 SELECT
 	a.`id`, a.`title`, a.`url`
@@ -212,14 +219,15 @@ ORDER BY
         throw err
       rows.forEach (tag)=>
         tag.articles = if !tag.articles then [] else _.intersection(@_articles_index, tag.articles.split(',').map (c)-> parseInt(c) )
-        @_tags[tag.id] = tag
-        @_tags_url[tag.url] = tag.id
-
+        tags[tag.id] = tag
+        tags_url[tag.url] = tag.id
+      @_tags = tags
+      @_tags_url = tags_url
       callback()
 
   _load_locations: (callback)->
-    @_locations = {}
-    @_locations_url = {}
+    locations = {}
+    locations_url = {}
     @_params.dbconnection.query """
 SELECT
 	a.`id`, a.`title`, a.`url`, a.`parent`
@@ -233,11 +241,12 @@ ORDER BY
         throw err
       rows.forEach (location)=>
         location.articles = if !location.articles then [] else _.intersection(@_articles_index, location.articles.split(',').map (c)-> parseInt(c) )
-        @_locations[location.id] = location
-        @_locations_url[location.url] = location.id
+        locations[location.id] = location
+        locations_url[location.url] = location.id
         if location.parent
-          @_locations[location.parent].articles = _.intersection(@_articles_index, @_locations[location.parent].articles.concat(location.articles))
-
+          locations[location.parent].articles = _.intersection(@_articles_index, locations[location.parent].articles.concat(location.articles))
+      @_locations = locations
+      @_locations_url = locations_url
       callback()
 
   sidebar: ->
