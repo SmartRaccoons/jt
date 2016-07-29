@@ -12,6 +12,7 @@
     "express": "4.13",
     "express-admin": "^1.2.8",
     "lodash": "4.0",
+    "lwip": "0.0.9",
     "memory-cache": "0.1.4",
     "moment": "^2.14.1",
     "mysql": "mysqljs/mysql",

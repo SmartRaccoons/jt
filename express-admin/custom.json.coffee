@@ -1,6 +1,11 @@
 fs = require('fs')
+_ = require('lodash')
 
-fs.writeFileSync __dirname + '/custom.json' , """{
+
+fs.writeFileSync __dirname + '/custom.json' , _.template("""{
+  "image": {
+    "events": "<%= local %>/events/image.js"
+  },
   "custom": {
     "public": {
       "local": {
@@ -12,4 +17,4 @@ fs.writeFileSync __dirname + '/custom.json' , """{
       }
     }
   }
-}""".replace('<%= local %>', __dirname)
+}""")({'local': __dirname})
