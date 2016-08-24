@@ -54,6 +54,7 @@ exports.lang = {
   url: 'http://jaunatelpa.lv'
   connect: 'Draudzējies ar mums'
   connect_fb: 'JaunaTelpa'
+  connect_fb_app_id: '1033046863479820'
   connect_fb_title: 'Seko facebook.com lapā'
   connect_dr: 'jaunatelpa'
   connect_dr_title: 'seko draugiem.lv lapā'
